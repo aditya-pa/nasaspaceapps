@@ -1,0 +1,185 @@
+/* Asteroid Visual Effects CSS */
+
+@keyframes deflection-explosion {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes collision-explosion {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  25% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(90deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.8) rotate(180deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(-50%, -50%) scale(2.5) rotate(270deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes freeze-sparkle {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes frost-glimmer {
+  0% {
+    filter: brightness(1) hue-rotate(0deg);
+  }
+  100% {
+    filter: brightness(1.3) hue-rotate(30deg);
+  }
+}
+
+/* Time Freeze Global Effect */
+.time-freeze-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(135, 206, 235, 0.1) 0%, rgba(70, 130, 180, 0.2) 100%);
+  pointer-events: none;
+  z-index: 5;
+  animation: freeze-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes freeze-pulse {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* Power-up Collection Effect */
+@keyframes power-up-collect {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.power-up-collect-effect {
+  animation: power-up-collect 1s ease-out forwards;
+}
+
+/* Particle Effects for Power-ups */
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #FFD700, #FFA500);
+  border-radius: 50%;
+  animation: particle-float 2s ease-out forwards;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--random-x, 50px), var(--random-y, -100px)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Enhanced Time Freeze Effect for UI */
+.time-freeze-ui {
+  filter: blur(1px) hue-rotate(180deg);
+  animation: freeze-shimmer 1s ease-in-out infinite alternate;
+}
+
+@keyframes freeze-shimmer {
+  0% {
+    box-shadow: 0 0 10px rgba(135, 206, 235, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(135, 206, 235, 0.8);
+  }
+}
+
+/* Sparkle effect for rare asteroids */
+@keyframes sparkle-effect {
+  0% {
+    box-shadow: 0 0 10px currentColor, inset 0 0 10px rgba(255,255,255,0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px currentColor, inset 0 0 20px rgba(255,255,255,0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px currentColor, inset 0 0 10px rgba(255,255,255,0.2);
+  }
+}
+
+/* Fire explosion effect */
+@keyframes fire-explosion {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.2) rotate(90deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0.7;
+  }
+  75% {
+    transform: scale(2) rotate(270deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(3) rotate(360deg);
+    opacity: 0;
+  }
+}

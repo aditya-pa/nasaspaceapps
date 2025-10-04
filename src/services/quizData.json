@@ -1,0 +1,258 @@
+{
+  "categories": {
+    "space": {
+      "name": "Space Science",
+      "icon": "🚀",
+      "questions": [
+        {
+          "id": "space_001",
+          "question": "What is the closest planet to the Sun?",
+          "answers": ["Mercury", "Venus", "Earth", "Mars"],
+          "correctAnswer": 0,
+          "points": 10,
+          "difficulty": "easy",
+          "explanation": "Mercury is the smallest planet and closest to the Sun, with temperatures reaching 800°F (427°C)!"
+        },
+        {
+          "id": "space_002", 
+          "question": "How many moons does Earth have?",
+          "answers": ["0", "1", "2", "3"],
+          "correctAnswer": 1,
+          "points": 5,
+          "difficulty": "easy",
+          "explanation": "Earth has one natural satellite - our Moon! It's about 1/4 the size of Earth."
+        },
+        {
+          "id": "space_003",
+          "question": "What is the largest planet in our solar system?",
+          "answers": ["Saturn", "Jupiter", "Neptune", "Uranus"],
+          "correctAnswer": 1,
+          "points": 10,
+          "difficulty": "easy",
+          "explanation": "Jupiter is massive! It's so big that all other planets could fit inside it."
+        },
+        {
+          "id": "space_004",
+          "question": "What causes meteor showers?",
+          "answers": ["Falling stars", "Comet debris", "Alien spacecraft", "Solar flares"],
+          "correctAnswer": 1,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "When Earth passes through a comet's debris trail, we see meteors burning up in our atmosphere!"
+        },
+        {
+          "id": "space_005",
+          "question": "How long does it take for light from the Sun to reach Earth?",
+          "answers": ["1 minute", "8 minutes", "1 hour", "1 day"],
+          "correctAnswer": 1,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "Sunlight travels 93 million miles (150 million km) to reach us in about 8 minutes and 20 seconds!"
+        },
+        {
+          "id": "space_006",
+          "question": "Which planet is known as the 'Red Planet'?",
+          "answers": ["Venus", "Mars", "Mercury", "Jupiter"],
+          "correctAnswer": 1,
+          "points": 10,
+          "difficulty": "easy",
+          "explanation": "Mars appears red because its surface contains iron oxide (rust)!"
+        },
+        {
+          "id": "space_007",
+          "question": "What is a light-year?",
+          "answers": ["A year with lots of light", "Distance light travels in one year", "Time for Earth to orbit Sun", "Speed of light"],
+          "correctAnswer": 1,
+          "points": 20,
+          "difficulty": "hard",
+          "explanation": "A light-year is about 6 trillion miles - the distance light travels in one year!"
+        }
+      ]
+    },
+    "math": {
+      "name": "Space Math",
+      "icon": "🔢",
+      "questions": [
+        {
+          "id": "math_001",
+          "question": "If an asteroid travels 25,000 km/h, how far does it travel in 2 hours?",
+          "answers": ["25,000 km", "50,000 km", "75,000 km", "100,000 km"],
+          "correctAnswer": 1,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "Distance = Speed × Time. 25,000 × 2 = 50,000 km!"
+        },
+        {
+          "id": "math_002",
+          "question": "Earth is about 150 million km from the Sun. What's this in scientific notation?",
+          "answers": ["1.5 × 10⁶", "1.5 × 10⁷", "1.5 × 10⁸", "1.5 × 10⁹"],
+          "correctAnswer": 2,
+          "points": 20,
+          "difficulty": "hard",
+          "explanation": "150 million = 150,000,000 = 1.5 × 10⁸ km. This distance is called 1 Astronomical Unit!"
+        },
+        {
+          "id": "math_003",
+          "question": "If Earth's diameter is 12,800 km, what's its radius?",
+          "answers": ["6,400 km", "25,600 km", "12,800 km", "3,200 km"],
+          "correctAnswer": 0,
+          "points": 10,
+          "difficulty": "easy",
+          "explanation": "Radius = Diameter ÷ 2. So 12,800 ÷ 2 = 6,400 km!"
+        },
+        {
+          "id": "math_004",
+          "question": "The Moon is about 384,000 km from Earth. How many Earth diameters is this?",
+          "answers": ["20", "30", "40", "50"],
+          "correctAnswer": 1,
+          "points": 20,
+          "difficulty": "hard",
+          "explanation": "384,000 ÷ 12,800 = 30. The Moon is about 30 Earth-widths away!"
+        },
+        {
+          "id": "math_005",
+          "question": "If you weigh 60 kg on Earth, you'd weigh about 10 kg on the Moon. What's the ratio?",
+          "answers": ["1:6", "1:10", "6:1", "10:1"],
+          "correctAnswer": 0,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "Moon's gravity is 1/6 of Earth's, so you weigh 6 times less there!"
+        }
+      ]
+    },
+    "science": {
+      "name": "General Science",
+      "icon": "🔬",
+      "questions": [
+        {
+          "id": "science_001",
+          "question": "What protects Earth from most asteroids and meteors?",
+          "answers": ["Magnetic field", "Atmosphere", "Ozone layer", "Moon's gravity"],
+          "correctAnswer": 1,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "Our thick atmosphere burns up most small space rocks before they reach the ground!"
+        },
+        {
+          "id": "science_002",
+          "question": "What are asteroids mostly made of?",
+          "answers": ["Ice", "Gas", "Rock and metal", "Plasma"],
+          "correctAnswer": 2,
+          "points": 10,
+          "difficulty": "easy",
+          "explanation": "Asteroids are leftover rocky and metallic material from when our solar system formed!"
+        },
+        {
+          "id": "science_003",
+          "question": "Why do we see meteor streaks in the sky?",
+          "answers": ["They're on fire", "Friction with air", "Solar radiation", "Magnetic fields"],
+          "correctAnswer": 1,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "High-speed friction with air molecules heats meteors until they glow!"
+        },
+        {
+          "id": "science_004",
+          "question": "What's the difference between a meteor and a meteorite?",
+          "answers": ["Size", "Speed", "One hits ground, one burns up", "Color"],
+          "correctAnswer": 2,
+          "points": 20,
+          "difficulty": "hard",
+          "explanation": "Meteors burn up in the atmosphere. If pieces survive and hit the ground, they're meteorites!"
+        },
+        {
+          "id": "science_005",
+          "question": "What force keeps planets orbiting the Sun?",
+          "answers": ["Magnetism", "Gravity", "Centrifugal force", "Solar wind"],
+          "correctAnswer": 1,
+          "points": 10,
+          "difficulty": "easy",
+          "explanation": "Gravity! The Sun's massive gravitational pull keeps all planets in orbit."
+        }
+      ]
+    },
+    "logic": {
+      "name": "Logic & Reasoning",
+      "icon": "🧩",
+      "questions": [
+        {
+          "id": "logic_001",
+          "question": "If asteroids A, B, and C are approaching Earth, and A is fastest, C is slowest, what order will they arrive?",
+          "answers": ["A, B, C", "C, B, A", "A, C, B", "B, A, C"],
+          "correctAnswer": 0,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "Fastest arrives first! Order: A (fastest), B (medium), C (slowest)."
+        },
+        {
+          "id": "logic_002",
+          "question": "A space pattern: 🌍 🌙 ⭐ 🌍 🌙 ⭐ 🌍 🌙 ? What comes next?",
+          "answers": ["🌍", "🌙", "⭐", "☄️"],
+          "correctAnswer": 2,
+          "points": 10,
+          "difficulty": "easy",
+          "explanation": "The pattern repeats every 3 symbols: Earth, Moon, Star!"
+        },
+        {
+          "id": "logic_003",
+          "question": "If it takes 5 lasers to destroy 1 large asteroid, how many lasers for 3 large asteroids?",
+          "answers": ["8", "15", "10", "12"],
+          "correctAnswer": 1,
+          "points": 15,
+          "difficulty": "medium",
+          "explanation": "5 lasers × 3 asteroids = 15 lasers total!"
+        },
+        {
+          "id": "logic_004",
+          "question": "Asteroid shields follow this pattern: Strong, Medium, Weak, Strong, Medium, Weak... The 7th asteroid has what shield?",
+          "answers": ["Strong", "Medium", "Weak", "None"],
+          "correctAnswer": 0,
+          "points": 20,
+          "difficulty": "hard",
+          "explanation": "Pattern repeats every 3: positions 1,4,7,10... are Strong shields!"
+        },
+        {
+          "id": "logic_005",
+          "question": "If Earth's shield drops 20% each wrong answer, starting at 100%, what's it after 2 wrong answers?",
+          "answers": ["60%", "40%", "80%", "50%"],
+          "correctAnswer": 0,
+          "points": 20,
+          "difficulty": "hard",
+          "explanation": "100% - 20% = 80%, then 80% - 20% = 60%!"
+        }
+      ]
+    }
+  },
+
+  "streakBonusQuestions": [
+    {
+      "id": "bonus_001",
+      "question": "🔥 STREAK BONUS: What famous physicist discovered gravity when an apple fell?",
+      "answers": ["Einstein", "Newton", "Galileo", "Hawking"],
+      "correctAnswer": 1,
+      "points": 25,
+      "difficulty": "bonus",
+      "explanation": "Sir Isaac Newton! His law of universal gravitation explains how gravity works throughout the universe."
+    },
+    {
+      "id": "bonus_002", 
+      "question": "🔥 STREAK BONUS: How many astronauts have walked on the Moon?",
+      "answers": ["6", "12", "18", "24"],
+      "correctAnswer": 1,
+      "points": 25,
+      "difficulty": "bonus",
+      "explanation": "12 astronauts walked on the Moon during 6 Apollo missions between 1969 and 1972!"
+    }
+  ],
+
+  "funFacts": [
+    "The asteroid belt contains millions of asteroids, but they're so spread out that spacecraft can easily fly through!",
+    "Some asteroids are actually 'rubble piles' - loose collections of rocks held together by gravity.",
+    "The metal in a single small asteroid could be worth billions of dollars on Earth!",
+    "Asteroid Vesta is so bright you can sometimes see it with the naked eye from Earth.",
+    "Some asteroids have been found to contain water ice - important for future space exploration!",
+    "The largest asteroid, Ceres, has its own atmosphere and may have an underground ocean.",
+    "Asteroids come in different types: rocky (S-type), metallic (M-type), and carbon-rich (C-type).",
+    "NASA's DART mission successfully changed an asteroid's orbit in 2022 - planetary defense in action!"
+  ]
+}
