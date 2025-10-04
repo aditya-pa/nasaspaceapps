@@ -118,20 +118,26 @@ export const initSounds = async () => {
   try {
     // Create Howl instances for each sound
     Object.entries(soundConfig).forEach(([key, config]) => {
-      sounds[key] = new Howl({
-        ...config,
-        onloaderror: (id, error) => {
-          console.warn(`Failed to load sound ${key}:`, error)
-          // Create a silent fallback sound
-          sounds[key] = new Howl({
-            src: [fallbackSounds[key] || fallbackSounds.laser],
-            volume: 0.1
-          })
-        },
+      try {
+        sounds[key] = new Howl({
+          ...config,
+          onloaderror: (id, error) => {
+            console.warn(`Failed to load sound ${key}:`, error)
+            // Create a silent fallback sound
+            sounds[key] = new Howl({
+              src: [fallbackSounds[key] || fallbackSounds.laser],
+              volume: 0.01
+            })
+          },
         onload: () => {
           console.log(`Sound loaded: ${key}`)
         }
       })
+      } catch (soundError) {
+        console.warn(`Failed to create sound ${key}:`, soundError)
+        // Create a silent fallback
+        sounds[key] = { play: () => {}, stop: () => {}, volume: () => {} }
+      }
     })
 
     initialized = true
