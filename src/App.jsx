@@ -252,7 +252,7 @@ function App() {
 
   return (
     <div className="w-full h-full bg-space-gradient overflow-hidden relative">
-      {/* Background Video */}
+      {/* Background Video - Optional for web deployment */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
         src="/bg.mp4"
@@ -260,6 +260,11 @@ function App() {
         loop
         muted
         playsInline
+        onError={(e) => {
+          // Hide video if it fails to load (e.g., on Netlify due to large file size)
+          e.target.style.display = 'none'
+          console.log('Background video failed to load - using CSS gradient background')
+        }}
       />
       {/* Dark overlay for better text visibility */}
       <div className="absolute inset-0 bg-black/40" />
