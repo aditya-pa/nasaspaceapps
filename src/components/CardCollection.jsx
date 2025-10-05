@@ -122,7 +122,8 @@ const getAsteroidFact = (card) => {
 const generateAsteroidImage = (diameter, velocity, name) => {
   // Create a unique seed based on asteroid properties
   const seed = name.split('').reduce((a, b) => a + b.charCodeAt(0), 0)
-  const size = Math.max(diameter / 10, 40)
+  // Constrain size to fit better in cards (40-60px range)
+  const size = Math.min(Math.max(diameter / 15, 40), 60)
   const hue = (seed * 137.5) % 60 + 20 // Browns and grays (20-80 hue)
   const saturation = 20 + (seed % 30) // Low saturation for realistic look
   const lightness = 25 + (seed % 20) // Dark colors
@@ -175,9 +176,9 @@ function AsteroidCard({ card, index }) {
     >
       <div className="relative w-full h-full">
         {/* Front of card */}
-        <div className="absolute inset-0 backface-hidden glassmorphic rounded-xl p-4 border-2" 
+        <div className="absolute inset-0 backface-hidden glassmorphic rounded-xl p-3 border-2" 
              style={{ borderColor: rarity.rarityColor, boxShadow: rarity.rarityGlow }}>
-          <div className="text-center h-full flex flex-col justify-between">
+          <div className="text-center h-full flex flex-col">
             {/* Rarity badge */}
             <div className="flex justify-between items-start mb-2">
               <div className="text-xs px-2 py-1 rounded-full font-bold"
@@ -192,8 +193,8 @@ function AsteroidCard({ card, index }) {
             </div>
             
             {/* Enhanced Asteroid visualization */}
-            <div className="mx-auto mb-3 relative" 
-                 style={{ width: `${asteroidImage.size}px`, height: `${asteroidImage.size}px` }}>
+            <div className="mx-auto mb-2 relative flex-shrink-0" 
+                 style={{ width: `${Math.min(asteroidImage.size, 60)}px`, height: `${Math.min(asteroidImage.size, 60)}px` }}>
               <div 
                 className="w-full h-full border-2 shadow-lg animate-pulse-neon relative overflow-hidden"
                 style={{ 
@@ -219,16 +220,16 @@ function AsteroidCard({ card, index }) {
             </div>
             
             {/* Name */}
-            <h3 className="font-bold text-lg mb-2 truncate"
+            <h3 className="font-bold text-sm mb-2 truncate"
                 style={{ color: rarity.rarityColor }}>
               {card.name}
             </h3>
             
             {/* Quick stats */}
-            <div className="text-sm text-gray-300 space-y-1">
+            <div className="text-xs text-gray-300 space-y-1 flex-1 flex flex-col justify-center">
               <div>📏 {formatSize(card.diameter)}</div>
               <div>⚡ {formatVelocity(card.velocity)}</div>
-              <div className="text-xs" style={{ color: rarity.rarityColor }}>⚡ Threat Level: {rarity.threatLevel}/16</div>
+              <div className="text-xs font-bold" style={{ color: rarity.rarityColor }}>⚡ Threat Level: {rarity.threatLevel}/16</div>
             </div>
             
 

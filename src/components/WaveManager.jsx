@@ -10,7 +10,8 @@ function WaveManager({
   asteroids,
   onWaveComplete,
   onBossSpawn,
-  onSpecialEvent 
+  onSpecialEvent,
+  onGameFreeze 
 }) {
   const [gamePhase, setGamePhase] = useState(GAME_PHASES.WAVE_PREP)
   const [waveConfig, setWaveConfig] = useState(null)
@@ -25,7 +26,6 @@ function WaveManager({
       setWaveConfig(config)
       setGamePhase(GAME_PHASES.WAVE_PREP)
       setWaveProgress({ destroyed: 0, spawned: 0 })
-      console.log('🌊 Wave', level, 'configuration:', config)
     }
   }, [level, gameState])
 
@@ -128,6 +128,14 @@ function WaveManager({
   useEffect(() => {
     window.updateWaveProgress = updateProgress
   }, [updateProgress])
+
+  // Freeze game during wave preparation and boss preparation
+  useEffect(() => {
+    if (onGameFreeze) {
+      const shouldFreeze = gamePhase === GAME_PHASES.WAVE_PREP || gamePhase === GAME_PHASES.BOSS_PREP
+      onGameFreeze(shouldFreeze)
+    }
+  }, [gamePhase, onGameFreeze])
 
   return (
     <AnimatePresence>

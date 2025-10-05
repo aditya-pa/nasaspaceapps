@@ -1,259 +1,152 @@
-import quizData from './quizData.json'
+// Educational Quiz System for AstroDefenders
+// 7-Wave progression system with NASA space education content
 
-console.log('🔥 DEBUG: Quiz data loaded:', quizData ? 'SUCCESS' : 'FAILED')
-console.log('🔥 DEBUG: Categories available:', Object.keys(quizData?.categories || {}))
+import { EDUCATIONAL_QUESTIONS, WAVE_INFO } from '../data/educationalQuestions'
 
-// Get all questions from all categories
-const getAllQuestions = () => {
-  console.log('🔥 DEBUG: Getting all questions...')
+// Get questions by wave/level (1-7 wave system)
+export const getQuestionsByWave = (wave = 1) => {
+  return EDUCATIONAL_QUESTIONS[wave] || EDUCATIONAL_QUESTIONS[1]
+}
+
+// Get random questions for a specific wave
+export const getWaveQuestions = (waveNumber, questionCount = 5) => {
+  const waveQuestions = EDUCATIONAL_QUESTIONS[waveNumber] || EDUCATIONAL_QUESTIONS[1]
+  
+  // Shuffle questions and return the requested number
+  const shuffled = [...waveQuestions].sort(() => 0.5 - Math.random())
+  return shuffled.slice(0, Math.min(questionCount, shuffled.length))
+}
+
+// Get wave information
+export const getWaveInfo = (wave) => {
+  return WAVE_INFO[wave] || WAVE_INFO[1]
+}
+
+// Get a random question based on current wave/level (1-7 wave system)
+export const getRandomQuestion = (level = 1, streak = 0, excludeQuestions = new Set()) => {
+  // Map level to wave (max 7 waves)
+  const wave = Math.min(level, 7)
+  
+  // Get questions from current wave, filtering out already answered ones
+  let waveQuestions = EDUCATIONAL_QUESTIONS[wave] || EDUCATIONAL_QUESTIONS[1]
+  waveQuestions = waveQuestions.filter(q => !excludeQuestions.has(q.question))
+  
+  // If no unanswered questions in current wave, get from other waves
+  if (waveQuestions.length === 0) {
+    console.log('⚠️ DEBUG: No unanswered questions in current wave, expanding search...')
+    // Try adjacent waves
+    const adjacentWaves = [wave - 1, wave + 1].filter(w => w >= 1 && w <= 7)
+    for (const adjacentWave of adjacentWaves) {
+      const adjacentQuestions = EDUCATIONAL_QUESTIONS[adjacentWave] || []
+      const unansweredAdjacent = adjacentQuestions.filter(q => !excludeQuestions.has(q.question))
+      if (unansweredAdjacent.length > 0) {
+        waveQuestions = unansweredAdjacent
+        break
+      }
+    }
+    
+    // If still no questions, use all questions (reset answered tracking for this wave)
+    if (waveQuestions.length === 0) {
+      console.log('⚠️ DEBUG: All questions answered, resetting for this wave...')
+      waveQuestions = EDUCATIONAL_QUESTIONS[wave] || EDUCATIONAL_QUESTIONS[1]
+    }
+  }
+  
+  // For high streaks, sometimes get harder questions from next wave
+  if (streak >= 5 && wave < 7 && Math.random() < 0.3) {
+    let nextWaveQuestions = EDUCATIONAL_QUESTIONS[wave + 1] || waveQuestions
+    nextWaveQuestions = nextWaveQuestions.filter(q => !excludeQuestions.has(q.question))
+    
+    if (nextWaveQuestions.length > 0) {
+      const hardQuestion = nextWaveQuestions[Math.floor(Math.random() * nextWaveQuestions.length)]
+      return {
+        ...hardQuestion,
+        points: Math.floor(hardQuestion.points * 1.5), // Bonus points for harder question
+        isBonus: true,
+        bonusText: `BONUS: ${WAVE_INFO[wave + 1]?.topic || 'Advanced'} Question!`,
+        wave: wave + 1,
+        topic: WAVE_INFO[wave + 1]?.topic || 'Advanced',
+        difficulty: WAVE_INFO[wave + 1]?.difficulty || 'Hard'
+      }
+    }
+  }
+  
+  // Return random question from available wave questions
+  const question = waveQuestions[Math.floor(Math.random() * waveQuestions.length)]
+  return {
+    ...question,
+    wave: wave,
+    topic: WAVE_INFO[wave]?.topic || 'Space Exploration',
+    difficulty: WAVE_INFO[wave]?.difficulty || 'Unknown'
+  }
+}
+
+// Get all questions from all waves
+export const getAllQuestions = () => {
   const allQuestions = []
-  Object.values(quizData.categories).forEach(category => {
-    allQuestions.push(...category.questions)
+  Object.values(EDUCATIONAL_QUESTIONS).forEach(waveQuestions => {
+    allQuestions.push(...waveQuestions)
   })
-  console.log('🔥 DEBUG: Total questions loaded:', allQuestions.length)
   return allQuestions
 }
 
 // Get questions by difficulty level
-export const getQuestionsByDifficulty = (difficulty = 'easy') => {
-  const allQuestions = getAllQuestions()
-  return allQuestions.filter(q => q.difficulty === difficulty)
-}
-
-// Get questions by category
-export const getQuestionsByCategory = (categoryId) => {
-  return quizData.categories[categoryId]?.questions || []
-}
-
-// Get a random REAL SPACE/SCIENCE question (no test questions!)
-export const getRandomQuestion = (level = 1, streak = 0) => {
-  console.log('🧐 DEBUG: Getting REAL space question for level:', level, 'streak:', streak)
-  let questions = []
+export const getQuestionsByDifficulty = (difficulty) => {
+  const difficultyMap = {
+    'easy': [1, 2],      // Waves 1-2
+    'medium': [3, 4],    // Waves 3-4  
+    'hard': [5, 6],      // Waves 5-6
+    'expert': [7]        // Wave 7
+  }
   
-  // Streak bonus questions for high streaks - ONLY REAL SPACE QUESTIONS
-  if (streak >= 5 && Math.random() < 0.3 && quizData.streakBonusQuestions) {
-    console.log('🔥 DEBUG: Using streak bonus space question!')
-    const bonusQuestions = quizData.streakBonusQuestions.filter(q => 
-      q.question && !q.question.toLowerCase().includes('2 + 2') && 
-      (q.question.toLowerCase().includes('space') || 
-       q.question.toLowerCase().includes('asteroid') ||
-       q.question.toLowerCase().includes('planet') ||
-       q.question.toLowerCase().includes('solar'))
-    )
-    if (bonusQuestions.length > 0) {
-      return bonusQuestions[Math.floor(Math.random() * bonusQuestions.length)]
+  const waves = difficultyMap[difficulty.toLowerCase()] || [1]
+  const questions = []
+  
+  waves.forEach(wave => {
+    if (EDUCATIONAL_QUESTIONS[wave]) {
+      questions.push(...EDUCATIONAL_QUESTIONS[wave])
     }
-  }
-  
-  // Difficulty progression based on level - FILTER OUT TEST QUESTIONS
-  if (level <= 2) {
-    // Early levels: mostly easy SPACE questions
-    const easySpaceQuestions = getQuestionsByDifficulty('easy').filter(q => 
-      q.question && !q.question.toLowerCase().includes('2 + 2') &&
-      (q.question.toLowerCase().includes('space') || 
-       q.question.toLowerCase().includes('asteroid') ||
-       q.question.toLowerCase().includes('earth') ||
-       q.question.toLowerCase().includes('moon') ||
-       q.question.toLowerCase().includes('solar') ||
-       q.question.toLowerCase().includes('planet'))
-    )
-    const mediumSpaceQuestions = getQuestionsByDifficulty('medium').filter(q => 
-      q.question && !q.question.toLowerCase().includes('2 + 2') &&
-      (q.question.toLowerCase().includes('space') || 
-       q.question.toLowerCase().includes('asteroid') ||
-       q.question.toLowerCase().includes('earth') ||
-       q.question.toLowerCase().includes('solar'))
-    )
-    questions = [...easySpaceQuestions, ...easySpaceQuestions, ...mediumSpaceQuestions] // Double weight easy
-  } else if (level <= 5) {
-    // Mid levels: mix of easy and medium SPACE questions
-    questions = [
-      ...getQuestionsByDifficulty('easy').filter(q => q.question && !q.question.includes('2 + 2')),
-      ...getQuestionsByDifficulty('medium').filter(q => q.question && !q.question.includes('2 + 2'))
-    ].filter(q => 
-      q.question.toLowerCase().includes('space') || 
-      q.question.toLowerCase().includes('asteroid') ||
-      q.question.toLowerCase().includes('nasa') ||
-      q.question.toLowerCase().includes('solar') ||
-      q.question.toLowerCase().includes('planet')
-    )
-    questions = [
-      ...getQuestionsByDifficulty('easy'),
-      ...getQuestionsByDifficulty('medium'),
-      ...getQuestionsByDifficulty('medium') // More medium questions
-    ]
-  } else {
-    // High levels: medium and hard SPACE questions only
-    const mediumSpaceQuestions = getQuestionsByDifficulty('medium').filter(q => 
-      q.question && !q.question.includes('2 + 2') &&
-      (q.question.toLowerCase().includes('space') || 
-       q.question.toLowerCase().includes('asteroid') ||
-       q.question.toLowerCase().includes('nasa') ||
-       q.question.toLowerCase().includes('galaxy') ||
-       q.question.toLowerCase().includes('planet') ||
-       q.question.toLowerCase().includes('solar'))
-    )
-    const hardSpaceQuestions = getQuestionsByDifficulty('hard').filter(q => 
-      q.question && !q.question.includes('2 + 2') &&
-      (q.question.toLowerCase().includes('space') || 
-       q.question.toLowerCase().includes('asteroid') ||
-       q.question.toLowerCase().includes('nasa') ||
-       q.question.toLowerCase().includes('scientific') ||
-       q.question.toLowerCase().includes('solar'))
-    )
-    questions = [...mediumSpaceQuestions, ...hardSpaceQuestions, ...hardSpaceQuestions] // Double weight hard
-  }
-
-  if (questions.length === 0) {
-    console.log('⚠️ DEBUG: No space questions found, using fallback real space questions')
-    questions = [
-      {
-        id: 'space_001',
-        question: 'What is the name of NASA\'s mission to study near-Earth asteroids?',
-        answers: ['DART', 'OSIRIS-REx', 'Lucy', 'NEAR Shoemaker'],
-        correctAnswer: 1,
-        difficulty: 'medium',
-        points: 15,
-        explanation: 'OSIRIS-REx successfully collected samples from asteroid Bennu!'
-      },
-      {
-        id: 'space_002', 
-        question: 'Which asteroid is known as potentially hazardous and will come close to Earth in 2029?',
-        answers: ['Ceres', 'Apophis', 'Vesta', 'Eros'],
-        correctAnswer: 1,
-        difficulty: 'hard',
-        points: 20,
-        explanation: 'Apophis will pass very close to Earth in 2029, closer than some satellites!'
-      },
-      {
-        id: 'space_003',
-        question: 'What causes most asteroids to be found between Mars and Jupiter?',
-        answers: ['Gravity', 'Solar wind', 'Magnetic fields', 'Temperature'],
-        correctAnswer: 0,
-        difficulty: 'easy', 
-        points: 10,
-        explanation: 'Jupiter\'s strong gravity prevented these rocks from forming into a planet!'
-      }
-    ]
-  }
-  
-  const selectedQuestion = questions[Math.floor(Math.random() * questions.length)]
-  console.log('✅ DEBUG: Selected REAL SPACE question:', selectedQuestion?.question?.substring(0, 50) + '...')
-  
-  // Ensure no test questions slip through
-  if (selectedQuestion?.question?.toLowerCase().includes('2 + 2')) {
-    console.log('⚠️ DEBUG: Detected test question, using fallback')
-    return {
-      id: 'space_fallback',
-      question: 'How many planets are in our solar system?',
-      answers: ['7', '8', '9', '10'],
-      correctAnswer: 1,
-      difficulty: 'easy',
-      points: 10,
-      explanation: 'There are 8 planets since Pluto was reclassified as a dwarf planet in 2006!'
-    }
-  }
-  
-  return selectedQuestion
-}
-
-// Get adaptive question based on player performance
-export const getAdaptiveQuestion = (correctAnswers, totalAnswers, level) => {
-  const accuracy = totalAnswers > 0 ? correctAnswers / totalAnswers : 0.5
-  
-  if (accuracy > 0.8) {
-    // Player doing well - give harder questions
-    const hardQuestions = getQuestionsByDifficulty('hard')
-    const mediumQuestions = getQuestionsByDifficulty('medium')
-    const candidates = [...hardQuestions, ...mediumQuestions]
-    return candidates[Math.floor(Math.random() * candidates.length)]
-  } else if (accuracy < 0.4) {
-    // Player struggling - give easier questions
-    const easyQuestions = getQuestionsByDifficulty('easy')
-    return easyQuestions[Math.floor(Math.random() * easyQuestions.length)]
-  } else {
-    // Balanced performance - normal progression
-    return getRandomQuestion(level)
-  }
-}
-
-// Get question statistics for analytics
-export const getQuizStats = () => {
-  const allQuestions = getAllQuestions()
-  const categories = Object.keys(quizData.categories)
-  
-  const stats = {
-    totalQuestions: allQuestions.length,
-    categoryCounts: {},
-    difficultyCounts: { easy: 0, medium: 0, hard: 0 },
-    averagePoints: 0
-  }
-  
-  // Count by category
-  categories.forEach(cat => {
-    stats.categoryCounts[cat] = quizData.categories[cat].questions.length
   })
   
-  // Count by difficulty and calculate average points
-  let totalPoints = 0
-  allQuestions.forEach(q => {
-    stats.difficultyCounts[q.difficulty]++
-    totalPoints += q.points
-  })
+  return questions
+}
+
+// Helper function to validate questions (remove any test content)
+export const validateQuestion = (question) => {
+  if (!question || !question.question) return false
   
-  stats.averagePoints = Math.round(totalPoints / allQuestions.length)
+  // Filter out any test questions
+  const testKeywords = ['2 + 2', 'test', 'android', 'debug']
+  const questionText = question.question.toLowerCase()
+  
+  return !testKeywords.some(keyword => questionText.includes(keyword))
+}
+
+// Get educational statistics
+export const getEducationalStats = () => {
+  const stats = {}
+  
+  Object.keys(EDUCATIONAL_QUESTIONS).forEach(wave => {
+    const waveNum = parseInt(wave)
+    const questions = EDUCATIONAL_QUESTIONS[wave]
+    stats[`wave${waveNum}`] = {
+      questionCount: questions.length,
+      topic: WAVE_INFO[waveNum]?.topic,
+      difficulty: WAVE_INFO[waveNum]?.difficulty,
+      avgPoints: Math.round(questions.reduce((sum, q) => sum + q.points, 0) / questions.length)
+    }
+  })
   
   return stats
 }
 
-// Get a fun fact
-export const getRandomFunFact = () => {
-  const facts = quizData.funFacts
-  return facts[Math.floor(Math.random() * facts.length)]
-}
-
-// Validate question format (for development)
-export const validateQuestion = (question) => {
-  const required = ['id', 'question', 'answers', 'correctAnswer', 'points', 'difficulty']
-  const missing = required.filter(field => !(field in question))
-  
-  if (missing.length > 0) {
-    console.warn(`Question ${question.id} missing fields:`, missing)
-    return false
-  }
-  
-  if (!Array.isArray(question.answers) || question.answers.length < 2) {
-    console.warn(`Question ${question.id} needs at least 2 answers`)
-    return false
-  }
-  
-  if (question.correctAnswer >= question.answers.length) {
-    console.warn(`Question ${question.id} correctAnswer index out of range`)
-    return false
-  }
-  
-  return true
-}
-
-// Initialize and validate all questions
-export const initializeQuiz = () => {
-  const allQuestions = getAllQuestions()
-  const invalidQuestions = allQuestions.filter(q => !validateQuestion(q))
-  
-  if (invalidQuestions.length > 0) {
-    console.warn(`Found ${invalidQuestions.length} invalid questions`)
-  }
-  
-  console.log(`Quiz initialized with ${allQuestions.length} questions`)
-  return getQuizStats()
-}
-
 export default {
   getRandomQuestion,
-  getAdaptiveQuestion,
+  getQuestionsByWave,
+  getWaveQuestions,
+  getWaveInfo,
+  getAllQuestions,
   getQuestionsByDifficulty,
-  getQuestionsByCategory,
-  getRandomFunFact,
-  getQuizStats,
-  initializeQuiz
+  validateQuestion,
+  getEducationalStats
 }

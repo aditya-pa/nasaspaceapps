@@ -159,7 +159,10 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
               <div className="text-red-500">
                 <div className="text-2xl mb-2">❌ Incorrect!</div>
                 <div className="text-lg">
-                  Earth takes damage! Correct answer was: {String.fromCharCode(65 + question.correctAnswer)}
+                  Earth takes damage! Correct answer was: <br/>
+                  <span className="text-neon-green font-semibold">
+                    {String.fromCharCode(65 + question.correctAnswer)}. {question.answers[question.correctAnswer]}
+                  </span>
                 </div>
               </div>
             )}

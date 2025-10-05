@@ -38,6 +38,7 @@ function App() {
   const [questionTimer, setQuestionTimer] = useState(null) // Time left to answer
   const [powerUps, setPowerUps] = useState([])
   const [collectedCards, setCollectedCards] = useState([])
+  const [answeredQuestions, setAnsweredQuestions] = useState(new Set()) // Track correctly answered questions
   
   // Refs for component methods
   const asteroidManagerRef = useRef()
@@ -56,6 +57,7 @@ function App() {
   const [unlockedAchievements, setUnlockedAchievements] = useState([])
   const [currentWaveConfig, setCurrentWaveConfig] = useState(null)
   const [specialEventActive, setSpecialEventActive] = useState(null)
+  const [gameFreezedByWave, setGameFreezedByWave] = useState(false)
   
   // Debug logging for asteroids state changes
   useEffect(() => {
@@ -135,6 +137,7 @@ function App() {
     setAsteroids([])
     setActiveQuestion(null)
     setPowerUps([])
+    setAnsweredQuestions(new Set()) // Reset answered questions for new game
     console.log('🎵 DEBUG: Playing background music')
     playSound('backgroundMusic', { loop: true, volume: 0.3 })
   }, [])
@@ -175,6 +178,12 @@ function App() {
       
       setScore(prev => prev + totalPoints)
       setStreak(prev => prev + 1)
+      
+      // Track correctly answered question to prevent duplicates
+      if (asteroid.question && asteroid.question.question) {
+        setAnsweredQuestions(prev => new Set([...prev, asteroid.question.question]))
+        console.log('✅ DEBUG: Added question to answered list:', asteroid.question.question.substring(0, 50) + '...')
+      }
       
       // Update game stats
       setGameStats(prev => ({
@@ -370,8 +379,10 @@ function App() {
               setActiveQuestion={setActiveQuestion}
               timeFreeze={activeTimeFreeze}
               questionFreeze={questionFreeze}
+              waveFreeze={gameFreezedByWave}
               level={level}
               gameState={gameState}
+              answeredQuestions={answeredQuestions}
               onAsteroidImpact={(damage, asteroid) => {
                 console.log('💥 DEBUG: Asteroid impact damage received in App.jsx:', damage)
                 setShield(prevShield => {
@@ -413,6 +424,7 @@ function App() {
               onSpecialEvent={(event) => {
                 setSpecialEventActive(event)
               }}
+              onGameFreeze={setGameFreezedByWave}
             />
             
             {/* Achievement System */}

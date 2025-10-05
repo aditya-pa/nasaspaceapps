@@ -17,45 +17,94 @@ export const ASTEROID_TYPES = {
   BOSS: 'boss'
 }
 
-// Wave configuration system
+// 7-Wave Educational Progression System
 export const getWaveConfig = (waveNumber) => {
+  // Ensure we don't go beyond 7 waves
+  const wave = Math.min(waveNumber, 7)
+  
   const baseConfig = {
-    waveNumber,
-    asteroidCount: Math.min(3 + Math.floor(waveNumber / 2), 8), // Max 8 asteroids
-    maxSimultaneous: Math.min(2 + Math.floor(waveNumber / 3), 4), // Max 4 at once
-    spawnRate: Math.max(1000, 3000 - (waveNumber * 150)), // Faster spawning
-    timeLimit: Math.max(8, 15 - waveNumber), // Shorter time limits
-    pointMultiplier: 1 + (waveNumber * 0.1), // 10% more points per wave
-    specialEvents: []
+    waveNumber: wave,
+    asteroidCount: Math.min(3 + wave, 10), // 4-10 asteroids per wave
+    maxSimultaneous: Math.min(2 + Math.floor(wave / 2), 5), // 2-5 simultaneous
+    spawnRate: Math.max(800, 2500 - (wave * 200)), // Progressively faster spawning
+    timeLimit: Math.max(6, 16 - wave), // 15s down to 9s (harder = less time)
+    pointMultiplier: 1 + (wave * 0.15), // 15% more points per wave
+    specialEvents: [],
+    topic: getWaveTopic(wave),
+    difficulty: getWaveDifficulty(wave)
   }
 
-  // Add difficulty modifiers based on wave number
-  if (waveNumber >= 3) {
+  // Progressive difficulty modifiers for 7-wave system
+  if (wave >= 2) {
     baseConfig.asteroidTypes = [ASTEROID_TYPES.NORMAL, ASTEROID_TYPES.FAST]
   }
   
-  if (waveNumber >= 5) {
+  if (wave >= 3) {
+    baseConfig.specialEvents.push('SOLAR_FLARE')
+  }
+  
+  if (wave >= 4) {
     baseConfig.asteroidTypes.push(ASTEROID_TYPES.HEAVY)
     baseConfig.specialEvents.push('METEOR_SHOWER')
   }
   
-  if (waveNumber >= 7) {
+  if (wave >= 5) {
     baseConfig.asteroidTypes.push(ASTEROID_TYPES.SPLITTER)
-    baseConfig.specialEvents.push('SOLAR_FLARE')
   }
   
-  if (waveNumber >= 10) {
+  if (wave >= 6) {
     baseConfig.asteroidTypes.push(ASTEROID_TYPES.SHIELD)
     baseConfig.specialEvents.push('ASTEROID_STORM')
   }
 
-  // Boss waves every 5 waves
-  if (waveNumber % 5 === 0) {
+  // Final boss wave at wave 7
+  if (wave === 7) {
     baseConfig.hasBoss = true
-    baseConfig.bossType = getBossType(Math.floor(waveNumber / 5))
+    baseConfig.bossType = getFinalBoss()
+    baseConfig.asteroidCount = 15 // Maximum challenge
+    baseConfig.timeLimit = 6 // Shortest time
   }
 
   return baseConfig
+}
+
+// Get wave topic information
+const getWaveTopic = (wave) => {
+  const topics = {
+    1: "Earth Basics",
+    2: "Moon Knowledge", 
+    3: "Solar System & Sun",
+    4: "Space Travel & Astronauts",
+    5: "Stars, Galaxies & Beyond",
+    6: "Comets, Meteors & Asteroids",
+    7: "Universe & Advanced Space Science"
+  }
+  return topics[wave] || "Space Exploration"
+}
+
+// Get wave difficulty description
+const getWaveDifficulty = (wave) => {
+  const difficulties = {
+    1: "Beginner",
+    2: "Easy",
+    3: "Medium",
+    4: "Medium-Hard", 
+    5: "Hard",
+    6: "Very Hard",
+    7: "Expert"
+  }
+  return difficulties[wave] || "Unknown"
+}
+
+// Final boss for wave 7
+const getFinalBoss = () => {
+  return {
+    name: 'The Universe\'s Ultimate Challenge',
+    size: 300,
+    health: 5,
+    special: 'COSMIC_STORM',
+    description: 'Face the ultimate test of your space knowledge! This cosmic entity challenges you with the deepest mysteries of the universe!'
+  }
 }
 
 // Boss asteroid configurations

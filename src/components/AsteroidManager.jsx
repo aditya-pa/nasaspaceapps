@@ -6,7 +6,7 @@ import { playSound } from '../services/soundManager'
 import { getRandomAsteroidSkin, getTexturePattern, getRotationSpeed } from '../data/asteroidSkins'
 import '../styles/asteroidEffects.css'
 
-function Asteroid({ asteroid, onReachEarth, onQuestionTrigger, timeFreeze, questionFreeze, isDeflected, isColliding, isWrongAnswer }) {
+function Asteroid({ asteroid, onReachEarth, onQuestionTrigger, timeFreeze, questionFreeze, waveFreeze, isDeflected, isColliding, isWrongAnswer }) {
   const earthSurfaceY = window.innerHeight * 0.75
 
   return (
@@ -20,7 +20,7 @@ function Asteroid({ asteroid, onReachEarth, onQuestionTrigger, timeFreeze, quest
         rotate: 0
       }}
       animate={
-        (timeFreeze || questionFreeze) && !isDeflected && !isColliding && !isWrongAnswer
+        (timeFreeze || questionFreeze || waveFreeze) && !isDeflected && !isColliding && !isWrongAnswer
           ? {
               x: asteroid.x || asteroid.startX,
               y: asteroid.y || -100,
@@ -168,11 +168,13 @@ const AsteroidManager = forwardRef(({
   setActiveQuestion,
   timeFreeze = false,
   questionFreeze = false,
+  waveFreeze = false,
   level = 1,
   onDeflection,
   onCollision,
   onAsteroidImpact, // Also support this prop name
-  gameState
+  gameState,
+  answeredQuestions = new Set() // Track correctly answered questions
 }, ref) => {
   const [deflectedAsteroids, setDeflectedAsteroids] = useState(new Set())
   const [collidingAsteroids, setCollidingAsteroids] = useState(new Set())
@@ -260,7 +262,7 @@ const AsteroidManager = forwardRef(({
 
   const spawnAsteroid = useCallback(async () => {
     try {
-      const question = await getRandomQuestion()
+      const question = await getRandomQuestion(level, 0, answeredQuestions)
       const asteroidTypes = ['REGULAR', 'GOLD', 'CRYSTAL']
       const randomType = asteroidTypes[Math.floor(Math.random() * asteroidTypes.length)]
       
@@ -292,49 +294,21 @@ const AsteroidManager = forwardRef(({
     } catch (error) {
       console.error('Error spawning asteroid:', error)
     }
-  }, [level, setAsteroids])
+  }, [level, setAsteroids, answeredQuestions])
 
-  // Add a simple test asteroid immediately 
-  useEffect(() => {
-    if (asteroids.length === 0) {
-      const testAsteroid = {
-        id: `test_${Date.now()}`,
-        name: 'Test Asteroid',
-        size: 80,
-        startX: window.innerWidth / 2,
-        endX: window.innerWidth / 2,
-        x: window.innerWidth / 2,
-        y: -100,
-        isPotentiallyHazardous: false,
-        diameter: 100,
-        velocity: 25000,
-        fallDuration: 8000,
-        questionTriggered: false,
-        question: {
-          question: 'Test: What is 2+2?',
-          answers: ['2', '4', '6', '8'],
-          correctAnswer: 1,
-          points: 10
-        },
-        threatLevel: 'MEDIUM',
-        skin: { type: 'GOLD' },
-        rotationSpeed: 15
-      }
-      setAsteroids([testAsteroid])
-    }
-  }, [])
+
 
   useEffect(() => {
-    if (gameState === 'playing' && !questionFreeze) {
+    if (gameState === 'playing' && !questionFreeze && !waveFreeze) {
       const interval = setInterval(() => {
-        if (asteroids.length < 5 && !questionFreeze) {
+        if (asteroids.length < 5 && !questionFreeze && !waveFreeze) {
           spawnAsteroid()
         }
       }, 1000 + Math.random() * 2000) // Spawn every 1-3 seconds
 
       return () => clearInterval(interval)
     }
-  }, [gameState, asteroids.length, spawnAsteroid, questionFreeze])
+  }, [gameState, asteroids.length, spawnAsteroid, questionFreeze, waveFreeze])
 
   useImperativeHandle(ref, () => ({
     handleAnswerResult
@@ -350,6 +324,7 @@ const AsteroidManager = forwardRef(({
           onQuestionTrigger={handleQuestionTrigger}
           timeFreeze={timeFreeze}
           questionFreeze={questionFreeze}
+          waveFreeze={waveFreeze}
           isDeflected={deflectedAsteroids.has(asteroid.id)}
           isColliding={collidingAsteroids.has(asteroid.id)}
           isWrongAnswer={wrongAnswerAsteroids.has(asteroid.id)}
