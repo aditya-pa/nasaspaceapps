@@ -29,7 +29,24 @@ function App() {
   // Game state - Start with loading
   const [gameState, setGameState] = useState(GAME_STATES.LOADING)
   const [score, setScore] = useState(0)
-  const [shield, setShield] = useState(100)
+  const [shield, setShieldInternal] = useState(100)
+  
+  // Wrap setShield to debug ALL shield changes
+  const setShield = useCallback((newValue) => {
+    console.log('🛡️ SHIELD CHANGE DETECTED!')
+    if (typeof newValue === 'function') {
+      setShieldInternal(prev => {
+        const result = newValue(prev)
+        console.log('🛡️ Shield function: ' + prev + ' -> ' + result)
+        console.trace('🛡️ Shield change stack trace')
+        return result
+      })
+    } else {
+      console.log('🛡️ Shield direct set: ' + shield + ' -> ' + newValue)
+      console.trace('🛡️ Shield direct change stack trace')
+      setShieldInternal(newValue)
+    }
+  }, [shield])
   const [level, setLevel] = useState(1)
   const [streak, setStreak] = useState(0)
   const [highScore, setHighScore] = useState(0)
@@ -300,7 +317,9 @@ function App() {
 
   // Game over handler
   useEffect(() => {
+    console.log('🔍 Game over check - Shield:', shield, 'GameState:', gameState)
     if (shield <= 0 && gameState === GAME_STATES.PLAYING) {
+      console.log('🚨 GAME OVER TRIGGERED! Shield:', shield)
       setGameState(GAME_STATES.GAME_OVER)
       stopSound('backgroundMusic')
       playSound('gameOver')
@@ -446,14 +465,26 @@ function App() {
               gameState={gameState}
               answeredQuestions={answeredQuestions}
               onAsteroidImpact={(damage, asteroid) => {
-                console.log('💥 DEBUG: Asteroid impact damage received in App.jsx:', damage)
-                setShield(prevShield => {
-                  const newShield = Math.max(0, prevShield - damage)
-                  console.log('🛡️ DEBUG: Shield reduced from', prevShield, 'to', newShield)
-                  return newShield
+                console.log('=== ASTEROID IMPACT DEBUG START ===')
+                console.log('Time:', new Date().toLocaleTimeString())
+                console.log('Raw damage received:', damage)
+                console.log('Damage type:', typeof damage)
+                console.log('Shield BEFORE impact:', shield)
+                
+                // Track how many times this function is called
+                window.impactCount = (window.impactCount || 0) + 1
+                console.log('Impact call #', window.impactCount)
+                
+                // FORCE 15 damage per hit
+                setShield(currentShield => {
+                  console.log('Inside setShield - current shield:', currentShield)
+                  console.log('Applying 15 damage')
+                  const result = currentShield - 15
+                  console.log('New shield will be:', result)
+                  return Math.max(0, result)
                 })
-                setStreak(0) // Reset streak on impact
-                playSound('impact') // Play impact sound
+                
+                console.log('=== ASTEROID IMPACT DEBUG END ===')
               }}
             />
             <PowerUps

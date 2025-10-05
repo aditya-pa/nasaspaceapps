@@ -194,10 +194,10 @@ function HUD({
 
       {/* Instructions (longer visibility) */}
       <motion.div
-        className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center z-40"
-        initial={{ opacity: 1, y: 0 }}
-        animate={{ opacity: 0, y: -20 }}
-        transition={{ delay: 10, duration: 3 }}
+        className="fixed top-1/2 left-8 transform -translate-y-1/2 text-left z-50"
+        initial={{ opacity: 1, x: -20 }}
+        animate={{ opacity: 0, x: -40 }}
+        transition={{ delay: 8, duration: 4 }}
       >
         <motion.div 
           className="glassmorphic px-6 py-4 rounded-xl border-2 border-neon-blue"

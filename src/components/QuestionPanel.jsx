@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 
 function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
@@ -6,13 +6,31 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [showResult, setShowResult] = useState(false)
 
+  // Shuffle answers and track correct answer position
+  const shuffledAnswers = useMemo(() => {
+    const answersWithIndex = question.answers.map((answer, index) => ({
+      text: answer,
+      originalIndex: index,
+      isCorrect: index === question.correctAnswer
+    }))
+    
+    // Fisher-Yates shuffle algorithm
+    for (let i = answersWithIndex.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[answersWithIndex[i], answersWithIndex[j]] = [answersWithIndex[j], answersWithIndex[i]]
+    }
+    
+    return answersWithIndex
+  }, [question])
+
   const handleAnswerSelect = (answerIndex) => {
     if (showResult) return
     
     setSelectedAnswer(answerIndex)
     setShowResult(true)
     
-    const isCorrect = answerIndex === question.correctAnswer
+    const selectedAnswerData = shuffledAnswers[answerIndex]
+    const isCorrect = selectedAnswerData.isCorrect
     
     // Delay before calling onAnswer to show result
     setTimeout(() => {
@@ -28,7 +46,8 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
     }
     
     // Show result state
-    if (index === question.correctAnswer) {
+    const answerData = shuffledAnswers[index]
+    if (answerData.isCorrect) {
       return baseClass + "border-neon-green bg-neon-green/20 text-neon-green"
     } else if (index === selectedAnswer) {
       return baseClass + "border-red-500 bg-red-500/20 text-red-500"
@@ -127,7 +146,7 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
           
           {/* Answer options */}
           <div className="grid gap-3">
-            {question.answers.map((answer, index) => (
+            {shuffledAnswers.map((answerData, index) => (
               <button
                 key={index}
                 className={getAnswerButtonClass(index)}
@@ -137,7 +156,7 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
                 <span className="font-bold mr-2">
                   {String.fromCharCode(65 + index)}.
                 </span>
-                {answer}
+                {answerData.text}
               </button>
             ))}
           </div>

@@ -183,11 +183,20 @@ const AsteroidManager = forwardRef(({
   const handleAsteroidReachEarth = useCallback((asteroid) => {
     // COMPLETELY BLOCK collision during question freeze
     if (questionFreeze) {
-
       return
     }
     
     if (!asteroid.questionTriggered) {
+      // PREVENT DUPLICATE DAMAGE - check if already processed
+      if (window.processedAsteroids && window.processedAsteroids.has(asteroid.id)) {
+        console.log('🚫 Duplicate asteroid impact blocked:', asteroid.id)
+        return
+      }
+      
+      // Mark as processed
+      if (!window.processedAsteroids) window.processedAsteroids = new Set()
+      window.processedAsteroids.add(asteroid.id)
+      
       setCollidingAsteroids(prev => new Set([...prev, asteroid.id]))
       
       setTimeout(() => {
@@ -197,13 +206,18 @@ const AsteroidManager = forwardRef(({
           newSet.delete(asteroid.id)
           return newSet
         })
+        // Clean up processed list
+        if (window.processedAsteroids) {
+          window.processedAsteroids.delete(asteroid.id)
+        }
       }, 1000)
 
       if (onCollision) {
         onCollision(asteroid)
       }
       if (onAsteroidImpact) {
-        onAsteroidImpact(20, asteroid) // Pass damage and asteroid
+        console.log('🟡 MISSED ASTEROID - sending 15 damage for', asteroid.name)
+        onAsteroidImpact(15, asteroid) // Pass damage and asteroid - reduced from 20
       }
     }
   }, [setAsteroids, onCollision, onAsteroidImpact, questionFreeze])
@@ -241,7 +255,8 @@ const AsteroidManager = forwardRef(({
       setTimeout(() => {
         setCollidingAsteroids(prev => new Set([...prev, asteroid.id]))
         if (onAsteroidImpact) {
-          onAsteroidImpact(30, asteroid) // Higher damage for wrong answer
+          console.log('🔴 WRONG ANSWER - sending 20 damage')
+          onAsteroidImpact(20, asteroid) // Higher damage for wrong answer - reduced from 30
         }
         setTimeout(() => {
           setAsteroids(prev => prev.filter(a => a.id !== asteroid.id))
@@ -360,10 +375,10 @@ const AsteroidManager = forwardRef(({
   useEffect(() => {
     if (gameState === 'playing' && !questionFreeze && !waveFreeze) {
       const interval = setInterval(() => {
-        if (asteroids.length < 5 && !questionFreeze && !waveFreeze) {
+        if (asteroids.length < 2 && !questionFreeze && !waveFreeze) { // Reduced from 5 to 2
           spawnAsteroid()
         }
-      }, 1000 + Math.random() * 2000) // Spawn every 1-3 seconds
+      }, 2000 + Math.random() * 3000) // Spawn every 2-5 seconds (slower)
 
       return () => clearInterval(interval)
     }
