@@ -10,10 +10,13 @@ import CardCollection from './components/CardCollection'
 import WaveManager from './components/WaveManager'
 import AchievementManager from './components/AchievementManager'
 import IntroPage from './components/IntroPage'
+import DefenseBeamManager from './components/DefenseBeamManager'
+import ShieldBoundary from './components/ShieldBoundary'
 import { initSounds, playSound, stopSound } from './services/soundManager'
 import { loadGameData, saveGameData } from './services/storage'
 import { fetchAsteroidData } from './services/nasaApi'
 import { getWaveConfig, getDailyChallenge } from './data/gameProgression'
+import { getEarthScreenPosition } from './utils/earthPosition'
 
 const GAME_STATES = {
   LOADING: 'loading',
@@ -58,6 +61,8 @@ function App() {
   const [powerUps, setPowerUps] = useState([])
   const [collectedCards, setCollectedCards] = useState([])
   const [answeredQuestions, setAnsweredQuestions] = useState(new Set()) // Track correctly answered questions
+  const [defenseBeams, setDefenseBeams] = useState([]) // Active defense beams
+  const [shieldImpacts, setShieldImpacts] = useState([]) // Shield impact effects
   
   // Refs for component methods
   const asteroidManagerRef = useRef()
@@ -161,6 +166,44 @@ function App() {
     playSound('backgroundMusic', { loop: true, volume: 0.3 })
   }, [])
 
+  // Create defense beam effect
+  const createDefenseBeam = useCallback((asteroid) => {
+    const earthPos = getEarthScreenPosition()
+    
+    const newBeam = {
+      id: `beam_${Date.now()}_${Math.random()}`,
+      startX: earthPos.x,
+      startY: earthPos.y,
+      endX: asteroid.x || asteroid.startX,
+      endY: asteroid.y || -100
+    }
+    
+    setDefenseBeams(prev => [...prev, newBeam])
+  }, [])
+
+  // Remove completed defense beam
+  const removeDefenseBeam = useCallback((beamId) => {
+    setDefenseBeams(prev => prev.filter(beam => beam.id !== beamId))
+  }, [])
+
+  // Create shield impact effect
+  const createShieldImpact = useCallback((asteroid) => {
+    const earthPos = getEarthScreenPosition()
+    
+    const newImpact = {
+      id: `impact_${Date.now()}_${Math.random()}`,
+      x: asteroid.x || asteroid.startX,
+      y: asteroid.y || earthPos.y
+    }
+    
+    setShieldImpacts(prev => [...prev, newImpact])
+  }, [])
+
+  // Remove completed shield impact
+  const removeShieldImpact = useCallback((impactId) => {
+    setShieldImpacts(prev => prev.filter(impact => impact.id !== impactId))
+  }, [])
+
   // Handle answer submission
   const handleAnswer = useCallback((isCorrect, asteroid) => {
     console.log('🎯 DEBUG: Answer submitted:', { isCorrect, asteroidName: asteroid.name })
@@ -175,6 +218,9 @@ function App() {
     }
     
     if (isCorrect) {
+      // Create defense beam effect
+      createDefenseBeam(asteroid)
+      
       // Correct answer - destroy asteroid with deflection animation
       const basePoints = 10
       const timeBonus = questionTimer > 0 ? Math.floor(questionTimer * 2) : 0 // Bonus for quick answers
@@ -471,6 +517,9 @@ function App() {
                 console.log('Damage type:', typeof damage)
                 console.log('Shield BEFORE impact:', shield)
                 
+                // Create shield impact visual effect
+                createShieldImpact(asteroid)
+                
                 // Track how many times this function is called
                 window.impactCount = (window.impactCount || 0) + 1
                 console.log('Impact call #', window.impactCount)
@@ -487,6 +536,20 @@ function App() {
                 console.log('=== ASTEROID IMPACT DEBUG END ===')
               }}
             />
+            
+            {/* Shield Boundary Visual */}
+            <ShieldBoundary
+              shield={shield}
+              impacts={shieldImpacts}
+              onImpactComplete={removeShieldImpact}
+            />
+            
+            {/* Defense Beam Effects */}
+            <DefenseBeamManager
+              beams={defenseBeams}
+              onBeamComplete={removeDefenseBeam}
+            />
+            
             <PowerUps
               powerUps={powerUps}
               setPowerUps={setPowerUps}

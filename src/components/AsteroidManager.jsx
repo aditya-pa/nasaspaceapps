@@ -5,9 +5,10 @@ import { getRandomQuestion } from '../services/quizData'
 import { playSound } from '../services/soundManager'
 import { getRandomAsteroidSkin, getTexturePattern, getRotationSpeed } from '../data/asteroidSkins'
 import '../styles/asteroidEffects.css'
+import { getEarthScreenPosition, SHIELD_RADIUS, getEarthSurfaceY } from '../utils/earthPosition'
 
 function Asteroid({ asteroid, onReachEarth, onQuestionTrigger, timeFreeze, questionFreeze, waveFreeze, isDeflected, isColliding, isWrongAnswer }) {
-  const earthSurfaceY = window.innerHeight * 0.75
+  const earthSurfaceY = getEarthSurfaceY()
 
   return (
     <motion.div
@@ -74,9 +75,18 @@ function Asteroid({ asteroid, onReachEarth, onQuestionTrigger, timeFreeze, quest
         asteroid.x = latest.x
         asteroid.y = latest.y
         
-        // Only check collision if not frozen by question or time freeze
-        if (!timeFreeze && !questionFreeze && latest.y > earthSurfaceY) {
-          if (onReachEarth) {
+        // Check for shield boundary collision (before reaching Earth surface)
+        if (!timeFreeze && !questionFreeze) {
+          const earthPos = getEarthScreenPosition()
+          
+          // Calculate distance from asteroid to Earth center
+          const distance = Math.sqrt(
+            Math.pow(latest.x - earthPos.x, 2) + 
+            Math.pow(latest.y - earthPos.y, 2)
+          )
+          
+          // Trigger collision when asteroid hits shield boundary
+          if (distance <= SHIELD_RADIUS && onReachEarth) {
             onReachEarth(asteroid)
           }
         }
@@ -288,7 +298,9 @@ const AsteroidManager = forwardRef(({
       
       const visualSize = Math.min(Math.max(nasaAsteroid.diameter / 2, 60), 120) // Scale for game display
       const startX = 50 + Math.random() * (window.innerWidth - 100)
-      const endX = 50 + Math.random() * (window.innerWidth - 100)
+      // All asteroids target Earth's precise center position
+      const earthPos = getEarthScreenPosition()
+      const endX = earthPos.x + (Math.random() - 0.5) * 80 // Small random offset around Earth center
       
       // Create asteroid with comprehensive NASA data
       const newAsteroid = {
