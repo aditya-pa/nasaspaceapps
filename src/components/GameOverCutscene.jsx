@@ -40,9 +40,21 @@ function GameOverCutscene({ onCutsceneComplete, score, highScore }) {
     onCutsceneComplete()
   }
 
-  const handleVideoError = () => {
-    console.warn('Cutscene video failed to load, skipping to game over screen')
-    onCutsceneComplete()
+  const [videoError, setVideoError] = useState(false)
+
+  const handleVideoError = (error) => {
+    console.warn('Cutscene video failed to load:', error)
+    console.log('Trying to load from:', window.location.origin + '/finalcutscene.mp4')
+    setVideoError(true)
+    
+    // Auto-complete after 3 seconds if video fails
+    setTimeout(() => {
+      onCutsceneComplete()
+    }, 3000)
+  }
+
+  const handleVideoLoad = () => {
+    console.log('Cutscene video loaded successfully')
   }
 
   return (
@@ -52,20 +64,95 @@ function GameOverCutscene({ onCutsceneComplete, score, highScore }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Video Container */}
+      {/* Video Container or Fallback */}
       <div className="relative w-full h-full">
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          playsInline
-          onEnded={handleVideoEnd}
-          onError={handleVideoError}
-        >
-          <source src="/large-assets/finalcutscene.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        {!videoError ? (
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            playsInline
+            onEnded={handleVideoEnd}
+            onError={handleVideoError}
+            onLoadedData={handleVideoLoad}
+            preload="auto"
+          >
+            <source src="/finalcutscene.mp4" type="video/mp4" />
+            <source src="/large-assets/finalcutscene.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          // Fallback animation when video fails
+          <div className="w-full h-full bg-gradient-to-b from-red-900 via-black to-orange-900 relative overflow-hidden">
+            {/* Animated Earth destruction effect */}
+            <motion.div
+              className="absolute inset-0"
+              style={{
+                background: `
+                  radial-gradient(circle at 50% 75%, 
+                    rgba(255, 69, 0, 0.8) 0%, 
+                    rgba(255, 0, 0, 0.6) 30%, 
+                    rgba(139, 0, 0, 0.4) 60%, 
+                    transparent 100%
+                  )
+                `
+              }}
+              animate={{
+                scale: [1, 1.5, 2],
+                opacity: [0.8, 1, 0.3]
+              }}
+              transition={{
+                duration: 3,
+                ease: "easeOut"
+              }}
+            />
+            
+            {/* Explosion particles */}
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-4 h-4 bg-orange-500 rounded-full"
+                style={{
+                  left: '50%',
+                  top: '75%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+                animate={{
+                  x: Math.cos(i * 30 * Math.PI / 180) * 300,
+                  y: Math.sin(i * 30 * Math.PI / 180) * 300,
+                  scale: [1, 0.5, 0],
+                  opacity: [1, 0.8, 0]
+                }}
+                transition={{
+                  duration: 2.5,
+                  delay: i * 0.1,
+                  ease: "easeOut"
+                }}
+              />
+            ))}
+
+            {/* Shockwave effect */}
+            <motion.div
+              className="absolute border-4 border-red-500 rounded-full"
+              style={{
+                left: '50%',
+                top: '75%',
+                transform: 'translate(-50%, -50%)'
+              }}
+              animate={{
+                width: [0, 800],
+                height: [0, 800],
+                opacity: [1, 0],
+                borderWidth: [4, 1]
+              }}
+              transition={{
+                duration: 2,
+                ease: "easeOut"
+              }}
+            />
+          </div>
+        )}
 
         {/* Overlay UI */}
         <div className="absolute inset-0 pointer-events-none">

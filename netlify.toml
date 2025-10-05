@@ -36,6 +36,18 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
+  for = "/*.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "video/mp4"
+
+[[headers]]
+  for = "/finalcutscene.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    Content-Type = "video/mp4"
+
+[[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"

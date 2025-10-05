@@ -87,6 +87,11 @@ const soundConfig = {
     volume: 0.8,
     preload: true
   },
+  minorHit: {
+    src: ['/sounds/minor hit.mp3'],
+    volume: 0.6,
+    preload: true
+  },
   correctAnswer: {
     src: ['/sounds/correct.mp3', '/sounds/correct.ogg'],
     volume: 0.5,

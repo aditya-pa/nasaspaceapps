@@ -401,7 +401,7 @@ function App() {
       console.log('🚨 GAME OVER TRIGGERED! Shield:', shield)
       setGameState(GAME_STATES.CUTSCENE) // Show cutscene first
       stopSound('backgroundMusic')
-      // Don't play game over sound yet - let cutscene handle it
+      playSound('gameOver') // Play game over sound when cutscene starts
       
       // Save high score
       if (score > highScore) {
@@ -414,7 +414,7 @@ function App() {
   // Handle cutscene completion
   const handleCutsceneComplete = useCallback(() => {
     setGameState(GAME_STATES.GAME_OVER)
-    playSound('gameOver')
+    // Game over sound already played when cutscene started
   }, [])
 
   // Handle loading completion
@@ -558,6 +558,9 @@ function App() {
                 
                 // Create shield impact visual effect
                 createShieldImpact(asteroid)
+                
+                // Play minor hit sound effect
+                playSound('minorHit')
                 
                 // Create fire effect on collision
                 console.log('🔥 Creating fire effect for asteroid collision at:', asteroid.x, asteroid.y)
