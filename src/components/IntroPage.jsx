@@ -127,7 +127,7 @@ function IntroPage({ onComplete }) {
           </motion.div>
 
           {/* Main content */}
-          <div className="relative z-10 text-center max-w-4xl mx-auto px-8">
+          <div className="relative z-10 text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -155,7 +155,7 @@ function IntroPage({ onComplete }) {
 
                 {/* Title */}
                 <motion.h1
-                  className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-orange-500 mb-4"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-orange-500 mb-4 px-4 leading-tight"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}

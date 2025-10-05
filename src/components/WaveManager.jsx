@@ -232,7 +232,7 @@ function WaveManager({
       {/* Wave Complete Screen */}
       {gamePhase === GAME_PHASES.WAVE_COMPLETE && (
         <motion.div
-          className="fixed inset-0 flex items-center justify-center z-50 bg-green-900/80"
+          className="fixed inset-0 flex items-center justify-center z-50 bg-black/80"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}

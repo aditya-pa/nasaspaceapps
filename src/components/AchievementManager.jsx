@@ -124,11 +124,11 @@ function AchievementManager({
         {recentAchievements.map((achievement, index) => (
           <motion.div
             key={achievement.id}
-            className="fixed top-20 right-4 z-50 glassmorphic p-4 border-2 border-neon-gold max-w-sm"
+            className="fixed top-20 right-4 z-50 glassmorphic p-4 border-2 border-neon-gold w-80"
             initial={{ x: 400, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 400, opacity: 0 }}
-            style={{ top: `${20 + index * 120}px` }}
+            style={{ top: `${80 + index * 140}px` }}
           >
             <div className="flex items-center space-x-3">
               <div className="text-3xl">{achievement.icon}</div>
@@ -161,7 +161,7 @@ function AchievementManager({
             return (
               <motion.div
                 key={achievement.id}
-                className="glassmorphic p-2 text-xs text-white opacity-80 hover:opacity-100 transition-opacity"
+                className="glassmorphic p-2 text-xs text-white opacity-80 hover:opacity-100 transition-opacity w-44"
                 whileHover={{ scale: 1.05 }}
               >
                 <div className="flex items-center space-x-2">

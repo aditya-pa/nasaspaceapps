@@ -377,7 +377,7 @@ function App() {
           >
             <div className="text-center">
               <motion.h1
-                className="text-6xl md:text-8xl font-bold text-gradient mb-8"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-gradient mb-8 px-4 leading-tight"
                 initial={{ y: -50 }}
                 animate={{ y: 0 }}
                 transition={{ delay: 0.2 }}
