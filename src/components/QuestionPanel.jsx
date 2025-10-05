@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 
 function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
-  console.log('🎯 DEBUG: QuestionPanel rendering with:', { question: question?.question, asteroid: asteroid?.name, timeLeft })
+
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [showResult, setShowResult] = useState(false)
 

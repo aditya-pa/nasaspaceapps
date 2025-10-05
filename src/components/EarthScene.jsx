@@ -112,7 +112,7 @@ function SpaceBackground() {
 }
 
 function EarthScene({ shield = 100, asteroids = [], onAsteroidClick, timeFreeze = false }) {
-  console.log('🌍 DEBUG: EarthScene rendering with', asteroids.length, 'asteroids')
+
   
   return (
     <div className="absolute inset-0 w-full h-full pointer-events-auto">

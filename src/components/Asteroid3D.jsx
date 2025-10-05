@@ -22,7 +22,7 @@ function Asteroid3D({
     modelPath = '/asteroid_1d_crystal__free_game_model.glb'
   }
   
-  console.log('🔴 DEBUG: Asteroid3D rendering with model:', modelPath)
+
   
   const gltf = useLoader(GLTFLoader, modelPath)
   

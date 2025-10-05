@@ -181,7 +181,7 @@ const AsteroidManager = forwardRef(({
   const handleAsteroidReachEarth = useCallback((asteroid) => {
     // COMPLETELY BLOCK collision during question freeze
     if (questionFreeze) {
-      console.log('🛡️ DEBUG: Collision blocked due to question freeze')
+
       return
     }
     
@@ -287,7 +287,7 @@ const AsteroidManager = forwardRef(({
         rotationSpeed: 15
       }
       
-      console.log('✅ Spawning real asteroid:', newAsteroid.name, 'Type:', randomType)
+
       setAsteroids(prev => [...prev, newAsteroid])
     } catch (error) {
       console.error('Error spawning asteroid:', error)

@@ -347,38 +347,7 @@ function App() {
 
         {gameState === GAME_STATES.PLAYING && (
           <>
-            {/* DEBUG: Show asteroid count */}
-            <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded z-50">
-              🌌 Asteroids: {asteroids.length}
-              <br />
-              🎮 Game State: {gameState}
-              <br />
-              <button 
-                className="bg-blue-500 px-2 py-1 rounded mt-1 text-xs"
-                onClick={() => {
-                  console.log('🔥 DEBUG: Current asteroids:', asteroids)
-                  console.log('🔥 DEBUG: Manually adding test asteroid...')
-                  const testAsteroid = {
-                    id: `manual_${Date.now()}`,
-                    name: 'Manual Test',
-                    size: 80,
-                    startX: 200,
-                    endX: 300,
-                    fallDuration: 10000,
-                    questionTriggered: false,
-                    question: {
-                      question: 'Manual test: What is 1+1?',
-                      answers: ['1', '2', '3', '4'],
-                      correctAnswer: 1,
-                      points: 10
-                    }
-                  }
-                  setAsteroids(prev => [...prev, testAsteroid])
-                }}
-              >
-                Add Test Asteroid
-              </button>
-            </div>
+
             
             <HUD 
               score={score}
@@ -392,47 +361,7 @@ function App() {
               questionTimer={questionTimer}
               questionFreeze={questionFreeze}
             />
-            {/* DEBUG PANEL - App.jsx asteroids state */}
-            <div className="absolute top-4 left-4 bg-red-500 text-white p-2 rounded z-50 text-sm">
-              <div>🚀 App.jsx Asteroids: {asteroids.length}</div>
-              <div>Game State: {gameState}</div>
-              <div>Active Question: {activeQuestion ? 'YES' : 'NO'}</div>
-              {asteroids.length > 0 && (
-                <div>IDs: {asteroids.map(a => a.id.slice(-4)).join(', ')}</div>
-              )}
-              <button 
-                className="bg-blue-600 px-2 py-1 rounded mt-1 text-xs"
-                onClick={async () => {
-                  console.log('🔥 TESTING NASA API DIRECTLY...')
-                  try {
-                    const today = new Date().toISOString().split('T')[0]
-                    const apiUrl = `https://api.nasa.gov/neo/rest/v1/feed?start_date=${today}&end_date=${today}&api_key=RkuqLf7O1I0V4kfLVH1feNAShVzdoMXlKq8Ermos`
-                    console.log('📡 Testing URL:', apiUrl)
-                    
-                    const response = await fetch(apiUrl)
-                    console.log('🌐 Response Status:', response.status)
-                    
-                    if (response.ok) {
-                      const data = await response.json()
-                      const todayAsteroids = data.near_earth_objects[today] || []
-                      console.log('✅ NASA API SUCCESS! Asteroids found:', todayAsteroids.length)
-                      console.log('🌌 Sample asteroid:', todayAsteroids[0]?.name)
-                      alert(`✅ NASA API WORKING! Found ${todayAsteroids.length} real asteroids!`)
-                    } else {
-                      console.error('❌ NASA API FAILED:', response.status, response.statusText)
-                      const errorText = await response.text()
-                      console.error('Error details:', errorText)
-                      alert(`❌ NASA API FAILED: ${response.status} - ${response.statusText}`)
-                    }
-                  } catch (error) {
-                    console.error('❌ NASA API ERROR:', error)
-                    alert(`❌ NASA API ERROR: ${error.message}`)
-                  }
-                }}
-              >
-                🔬 Test NASA API
-              </button>
-            </div>
+
             
             <AsteroidManager
               ref={asteroidManagerRef}
@@ -508,35 +437,6 @@ function App() {
                 asteroid={activeQuestion.asteroid}
                 onAnswer={handleAnswer}
               />
-            )}
-            
-            {/* DEBUG: Force show question panel for testing */}
-            {gameState === GAME_STATES.PLAYING && !activeQuestion && (
-              <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50">
-                <button 
-                  className="bg-red-500 text-white px-4 py-2 rounded font-bold"
-                  onClick={() => {
-                    console.log('🔥 DEBUG: Force triggering test question')
-                    setActiveQuestion({
-                      question: {
-                        question: 'TEST: What is 2 + 2?',
-                        answers: ['2', '4', '6', '8'],
-                        correctAnswer: 1,
-                        points: 10,
-                        explanation: 'Basic math!'
-                      },
-                      asteroid: {
-                        id: 'test',
-                        name: 'Test Asteroid',
-                        diameter: 100,
-                        velocity: 25000
-                      }
-                    })
-                  }}
-                >
-                  🔥 DEBUG: Force Show Question
-                </button>
-              </div>
             )}
           </>
         )}
