@@ -12,6 +12,7 @@ import AchievementManager from './components/AchievementManager'
 import IntroPage from './components/IntroPage'
 import DefenseBeamManager from './components/DefenseBeamManager'
 import ShieldBoundary from './components/ShieldBoundary'
+import FireEffectManager from './components/FireEffectManager'
 import { initSounds, playSound, stopSound } from './services/soundManager'
 import { loadGameData, saveGameData } from './services/storage'
 import { fetchAsteroidData } from './services/nasaApi'
@@ -63,6 +64,7 @@ function App() {
   const [answeredQuestions, setAnsweredQuestions] = useState(new Set()) // Track correctly answered questions
   const [defenseBeams, setDefenseBeams] = useState([]) // Active defense beams
   const [shieldImpacts, setShieldImpacts] = useState([]) // Shield impact effects
+  const [fireEffects, setFireEffects] = useState([]) // Fire effects for collisions
   
   // Refs for component methods
   const asteroidManagerRef = useRef()
@@ -202,6 +204,35 @@ function App() {
   // Remove completed shield impact
   const removeShieldImpact = useCallback((impactId) => {
     setShieldImpacts(prev => prev.filter(impact => impact.id !== impactId))
+  }, [])
+
+  // Create fire effect
+  const createFireEffect = useCallback((asteroid) => {
+    const earthPos = getEarthScreenPosition()
+    
+    // Calculate angle from Earth center to asteroid (where impact occurs)
+    const dx = (asteroid.x || asteroid.startX) - earthPos.x
+    const dy = (asteroid.y || earthPos.y) - earthPos.y
+    
+    // Fire should shoot away from Earth center through the collision point
+    // atan2 gives us the direction from Earth to collision point
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+    
+    console.log('🔥 Fire angle calculated:', angle, 'degrees for collision at', dx, dy)
+    
+    const newFire = {
+      id: `fire_${Date.now()}_${Math.random()}`,
+      x: asteroid.x || asteroid.startX,
+      y: asteroid.y || earthPos.y,
+      angle: angle // Fire direction from Earth center through collision point
+    }
+    
+    setFireEffects(prev => [...prev, newFire])
+  }, [])
+
+  // Remove completed fire effect
+  const removeFireEffect = useCallback((fireId) => {
+    setFireEffects(prev => prev.filter(fire => fire.id !== fireId))
   }, [])
 
   // Handle answer submission
@@ -520,6 +551,10 @@ function App() {
                 // Create shield impact visual effect
                 createShieldImpact(asteroid)
                 
+                // Create fire effect on collision
+                console.log('🔥 Creating fire effect for asteroid collision at:', asteroid.x, asteroid.y)
+                createFireEffect(asteroid)
+                
                 // Track how many times this function is called
                 window.impactCount = (window.impactCount || 0) + 1
                 console.log('Impact call #', window.impactCount)
@@ -548,6 +583,12 @@ function App() {
             <DefenseBeamManager
               beams={defenseBeams}
               onBeamComplete={removeDefenseBeam}
+            />
+            
+            {/* Fire Effects */}
+            <FireEffectManager
+              fires={fireEffects}
+              onFireComplete={removeFireEffect}
             />
             
             <PowerUps

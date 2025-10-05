@@ -1,0 +1,194 @@
+/* Fire Effect CSS */
+.fire-container {
+  position: absolute;
+  pointer-events: none;
+}
+
+.fire {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  background: #ff9900;
+  filter: blur(2px) contrast(12);
+  border-radius: 50%;
+  box-sizing: border-box;
+  /* Remove directional bias - fire will be controlled by animation */
+}
+
+.fire .burn {
+  position: absolute;
+  top: 12px; /* Center the particles */
+  left: 12px; /* Center the particles */
+  width: 6px;
+  height: 6px;
+  background: #000;
+  border-radius: 100%;
+}
+
+/* Heat particles (orange/yellow flames) */
+.fire .burn.heat {
+  background: #ff6600;
+  filter: blur(2px);
+}
+
+/* Generate random fire particles */
+.fire .burn:nth-child(1) {
+  height: 4px;
+  margin-left: -6px;
+  animation: burning 500ms infinite linear;
+  animation-delay: 0ms;
+}
+
+.fire .burn:nth-child(2) {
+  height: 5px;
+  margin-left: 4px;
+  animation: burning 550ms infinite linear;
+  animation-delay: -100ms;
+}
+
+.fire .burn:nth-child(3) {
+  height: 12px;
+  margin-left: -5px;
+  animation: burning 700ms infinite linear;
+  animation-delay: -200ms;
+}
+
+.fire .burn:nth-child(4) {
+  height: 20px;
+  margin-left: 25px;
+  animation: burning 1000ms infinite linear;
+  animation-delay: -300ms;
+}
+
+.fire .burn:nth-child(5) {
+  height: 16px;
+  margin-left: -15px;
+  animation: burning 850ms infinite linear;
+  animation-delay: -400ms;
+}
+
+.fire .burn:nth-child(6) {
+  height: 14px;
+  margin-left: 10px;
+  animation: burning 750ms infinite linear;
+  animation-delay: -500ms;
+}
+
+.fire .burn:nth-child(7) {
+  height: 22px;
+  margin-left: -25px;
+  animation: burning 1100ms infinite linear;
+  animation-delay: -600ms;
+}
+
+.fire .burn:nth-child(8) {
+  height: 17px;
+  margin-left: 20px;
+  animation: burning 950ms infinite linear;
+  animation-delay: -700ms;
+}
+
+.fire .burn:nth-child(9) {
+  height: 13px;
+  margin-left: 0px;
+  animation: burning 800ms infinite linear;
+  animation-delay: -800ms;
+}
+
+.fire .burn:nth-child(10) {
+  height: 19px;
+  margin-left: -10px;
+  animation: burning 1050ms infinite linear;
+  animation-delay: -900ms;
+}
+
+.fire .burn:nth-child(11) {
+  height: 15px;
+  margin-left: 30px;
+  animation: burning 900ms infinite linear;
+  animation-delay: -100ms;
+}
+
+.fire .burn:nth-child(12) {
+  height: 21px;
+  margin-left: -30px;
+  animation: burning 1200ms infinite linear;
+  animation-delay: -200ms;
+}
+
+.fire .burn:nth-child(13) {
+  height: 16px;
+  margin-left: 5px;
+  animation: burning 850ms infinite linear;
+  animation-delay: -300ms;
+}
+
+.fire .burn:nth-child(14) {
+  height: 18px;
+  margin-left: -20px;
+  animation: burning 950ms infinite linear;
+  animation-delay: -400ms;
+}
+
+.fire .burn:nth-child(15) {
+  height: 14px;
+  margin-left: 15px;
+  animation: burning 800ms infinite linear;
+  animation-delay: -500ms;
+}
+
+.fire .burn:nth-child(16) {
+  height: 20px;
+  margin-left: -5px;
+  animation: burning 1000ms infinite linear;
+  animation-delay: -600ms;
+}
+
+.fire .burn:nth-child(17) {
+  height: 17px;
+  margin-left: 25px;
+  animation: burning 900ms infinite linear;
+  animation-delay: -700ms;
+}
+
+.fire .burn:nth-child(18) {
+  height: 15px;
+  margin-left: -25px;
+  animation: burning 850ms infinite linear;
+  animation-delay: -800ms;
+}
+
+.fire .burn:nth-child(19) {
+  height: 19px;
+  margin-left: 10px;
+  animation: burning 1050ms infinite linear;
+  animation-delay: -900ms;
+}
+
+.fire .burn:nth-child(20) {
+  height: 16px;
+  margin-left: -15px;
+  animation: burning 900ms infinite linear;
+  animation-delay: -100ms;
+}
+
+@keyframes burning {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(
+      calc(var(--fire-direction-x, 0px) * 0.5 + var(--particle-offset, 0px)), 
+      calc(var(--fire-direction-y, -8px) * 0.5)
+    ) scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(
+      calc(var(--fire-direction-x, 0px) + var(--particle-offset, 0px)), 
+      var(--fire-direction-y, -15px)
+    ) scale(0.8);
+    opacity: 0;
+  }
+}
