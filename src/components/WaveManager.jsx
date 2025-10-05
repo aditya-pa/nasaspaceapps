@@ -274,7 +274,7 @@ function WaveManager({
 
       {/* Wave Progress HUD */}
       {gamePhase === GAME_PHASES.WAVE_ACTIVE && waveConfig && (
-        <div className="fixed top-4 right-4 z-30 glassmorphic p-3 text-white text-sm">
+        <div className="fixed top-24 right-4 z-30 glassmorphic p-3 text-white text-sm">
           <div className="space-y-1">
             <div>Wave {level}</div>
             <div>Progress: {waveProgress.destroyed}/{waveConfig.asteroidCount}</div>

@@ -266,25 +266,84 @@ const AsteroidManager = forwardRef(({
       const asteroidTypes = ['REGULAR', 'GOLD', 'CRYSTAL']
       const randomType = asteroidTypes[Math.floor(Math.random() * asteroidTypes.length)]
       
-      const visualSize = 60 + Math.random() * 60 // 60-120px
+      // Fetch real NASA asteroid data for comprehensive information
+      console.log('🚀 DEBUG: Fetching NASA asteroid data for game...')
+      const nasaAsteroid = await fetchAsteroidData()
+      console.log('📊 DEBUG: Received NASA asteroid:', nasaAsteroid.name)
+      
+      const visualSize = Math.min(Math.max(nasaAsteroid.diameter / 2, 60), 120) // Scale for game display
       const startX = 50 + Math.random() * (window.innerWidth - 100)
       const endX = 50 + Math.random() * (window.innerWidth - 100)
       
+      // Create asteroid with comprehensive NASA data
       const newAsteroid = {
-        id: `asteroid_${Date.now()}_${Math.random()}`,
-        name: `Asteroid ${Math.floor(Math.random() * 1000)}`,
+        // NASA Identity & Physical Data
+        id: nasaAsteroid.id,
+        name: nasaAsteroid.name,
+        nameSimple: nasaAsteroid.nameSimple,
+        diameter: nasaAsteroid.diameter,
+        diameterMin: nasaAsteroid.diameterMin,
+        diameterMax: nasaAsteroid.diameterMax,
+        absoluteMagnitude: nasaAsteroid.absoluteMagnitude,
+        
+        // NASA Approach Data
+        velocity: nasaAsteroid.velocity,
+        velocityKmh: nasaAsteroid.velocityKmh,
+        velocityKms: nasaAsteroid.velocityKms,
+        missDistance: nasaAsteroid.missDistance,
+        missDistanceAU: nasaAsteroid.missDistanceAU,
+        missDistanceLunar: nasaAsteroid.missDistanceLunar,
+        approachDate: nasaAsteroid.approachDate,
+        approachDateFull: nasaAsteroid.approachDateFull,
+        orbitingBody: nasaAsteroid.orbitingBody,
+        
+        // NASA Classifications
+        isPotentiallyHazardous: nasaAsteroid.isPotentiallyHazardous,
+        isSentryObject: nasaAsteroid.isSentryObject,
+        
+        // NASA Discovery & Observation Data
+        firstObservationDate: nasaAsteroid.firstObservationDate,
+        lastObservationDate: nasaAsteroid.lastObservationDate,
+        dataArcInDays: nasaAsteroid.dataArcInDays,
+        observationsUsed: nasaAsteroid.observationsUsed,
+        orbitDeterminationDate: nasaAsteroid.orbitDeterminationDate,
+        
+        // NASA Orbital Elements
+        orbitId: nasaAsteroid.orbitId,
+        eccentricity: nasaAsteroid.eccentricity,
+        semiMajorAxis: nasaAsteroid.semiMajorAxis,
+        inclination: nasaAsteroid.inclination,
+        orbitalPeriod: nasaAsteroid.orbitalPeriod,
+        perihelionDistance: nasaAsteroid.perihelionDistance,
+        aphelionDistance: nasaAsteroid.aphelionDistance,
+        meanMotion: nasaAsteroid.meanMotion,
+        meanAnomaly: nasaAsteroid.meanAnomaly,
+        
+        // NASA Orbit Classification
+        orbitClass: nasaAsteroid.orbitClass,
+        orbitClassDescription: nasaAsteroid.orbitClassDescription,
+        orbitClassRange: nasaAsteroid.orbitClassRange,
+        
+        // NASA Tisserand Parameter
+        jupiterTisserandInvariant: nasaAsteroid.jupiterTisserandInvariant,
+        minimumOrbitIntersection: nasaAsteroid.minimumOrbitIntersection,
+        
+        // NASA JPL Reference
+        nasaJplUrl: nasaAsteroid.nasaJplUrl,
+        
+        // NASA Fact
+        fact: nasaAsteroid.fact,
+        
+        // Game Properties
         size: visualSize,
         startX: startX,
         endX: endX,
         x: startX,
         y: -100,
-        isPotentiallyHazardous: Math.random() < 0.3,
-        diameter: visualSize,
-        velocity: 25000,
         fallDuration: 8000,
         questionTriggered: false,
         question: question,
-        threatLevel: visualSize > 100 ? 'HIGH' : 'MEDIUM',
+        threatLevel: nasaAsteroid.isPotentiallyHazardous ? 'HIGH' : (nasaAsteroid.diameter > 100 ? 'MEDIUM' : 'LOW'),
         skin: { type: randomType },
         rotationSpeed: 15
       }

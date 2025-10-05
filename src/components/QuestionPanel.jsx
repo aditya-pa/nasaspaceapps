@@ -57,7 +57,7 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
         {/* Timer and Asteroid info header */}
         <div className="text-center mb-6">
           {/* URGENT TIMER */}
-          {timeLeft !== null && (
+          {timeLeft !== null && timeLeft !== undefined && (
             <div className="mb-4">
               <div 
                 className="inline-block px-4 py-2 rounded-full font-bold text-lg border-2 animate-pulse"
@@ -67,7 +67,7 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
                   color: timeLeft <= 3 ? '#FF6B6B' : timeLeft <= 7 ? '#FFB347' : '#90EE90'
                 }}
               >
-                ⏰ {timeLeft}s {timeLeft <= 3 ? 'HURRY!' : timeLeft <= 7 ? 'QUICK!' : 'remaining'}
+                ⏰ {Math.max(0, Math.floor(timeLeft))} {timeLeft <= 3 ? 'HURRY!' : timeLeft <= 7 ? 'QUICK!' : 'seconds remaining'}
               </div>
             </div>
           )}

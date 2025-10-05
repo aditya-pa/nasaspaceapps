@@ -227,8 +227,60 @@ function App() {
     const card = {
       id: asteroid.id,
       name: asteroid.name,
+      nameSimple: asteroid.nameSimple || asteroid.name,
+      
+      // Physical characteristics (NASA verified)
       diameter: asteroid.diameter,
+      diameterMin: asteroid.diameterMin || asteroid.diameter * 0.8,
+      diameterMax: asteroid.diameterMax || asteroid.diameter * 1.2,
+      absoluteMagnitude: asteroid.absoluteMagnitude || 20,
+      
+      // Approach data (NASA calculated)
       velocity: asteroid.velocity,
+      velocityKmh: asteroid.velocityKmh || asteroid.velocity,
+      velocityKms: asteroid.velocityKms || asteroid.velocity / 3600,
+      missDistance: asteroid.missDistance || 1000000,
+      missDistanceAU: asteroid.missDistanceAU || 0.1,
+      missDistanceLunar: asteroid.missDistanceLunar || 38,
+      approachDate: asteroid.approachDate || new Date().toISOString().split('T')[0],
+      approachDateFull: asteroid.approachDateFull || new Date().toISOString(),
+      orbitingBody: asteroid.orbitingBody || 'Earth',
+      
+      // NASA classifications
+      isPotentiallyHazardous: asteroid.isPotentiallyHazardous || false,
+      isSentryObject: asteroid.isSentryObject || false,
+      
+      // Discovery and observation data (NASA records)
+      firstObservationDate: asteroid.firstObservationDate || null,
+      lastObservationDate: asteroid.lastObservationDate || null,
+      dataArcInDays: asteroid.dataArcInDays || null,
+      observationsUsed: asteroid.observationsUsed || null,
+      orbitDeterminationDate: asteroid.orbitDeterminationDate || null,
+      
+      // Orbital elements (NASA calculated)
+      orbitId: asteroid.orbitId || null,
+      eccentricity: asteroid.eccentricity || null,
+      semiMajorAxis: asteroid.semiMajorAxis || null,
+      inclination: asteroid.inclination || null,
+      orbitalPeriod: asteroid.orbitalPeriod || null,
+      perihelionDistance: asteroid.perihelionDistance || null,
+      aphelionDistance: asteroid.aphelionDistance || null,
+      meanMotion: asteroid.meanMotion || null,
+      meanAnomaly: asteroid.meanAnomaly || null,
+      
+      // Orbit classification (NASA)
+      orbitClass: asteroid.orbitClass || null,
+      orbitClassDescription: asteroid.orbitClassDescription || null,
+      orbitClassRange: asteroid.orbitClassRange || null,
+      
+      // Tisserand parameter (NASA calculated)
+      jupiterTisserandInvariant: asteroid.jupiterTisserandInvariant || null,
+      minimumOrbitIntersection: asteroid.minimumOrbitIntersection || null,
+      
+      // NASA JPL reference
+      nasaJplUrl: asteroid.nasaJplUrl || '',
+      
+      // Original fact
       fact: asteroid.fact,
       timestamp: Date.now()
     }

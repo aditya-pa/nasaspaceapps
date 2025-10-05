@@ -2,52 +2,54 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Calculate asteroid threat level rarity based on classification, distance, and size
-const calculateRarity = (diameter, velocity, name, distance = null) => {
+const calculateRarity = (card) => {
   let rarity = 'Common'
   let rarityColor = '#9CA3AF' // Gray
   let rarityGlow = '0 0 10px rgba(156, 163, 175, 0.5)'
   
-  // Classification factor - potentially hazardous objects are rarer
+  // Use enhanced NASA data for classification
   let classificationScore = 1
-  if (name.includes('Apophis') || name.includes('Bennu') || name.includes('Didymos') || name.includes('1999 RQ36')) {
-    classificationScore = 5 // Known potentially hazardous asteroids
-  } else if (name.match(/^\d{4} [A-Z]{2}\d*$/)) {
+  if (card.isPotentiallyHazardous) {
+    classificationScore = 5 // NASA-verified potentially hazardous asteroid
+  } else if (card.name.includes('Apophis') || card.name.includes('Bennu') || card.name.includes('Didymos')) {
+    classificationScore = 4 // Famous asteroids
+  } else if (card.name.match(/^\d{4} [A-Z]{2}\d*$/)) {
     classificationScore = 2 // Recent discoveries (numbered format)
-  } else if (name.length < 8) {
+  } else if (card.name.length < 8) {
     classificationScore = 3 // Named asteroids are typically more significant
   }
   
-  // Size-based threat factor
+  // Size-based threat factor using accurate diameter
   let sizeScore = 1
-  if (diameter >= 1000) {
+  if (card.diameter >= 1000) {
     sizeScore = 5 // Civilization-ending threat
-  } else if (diameter >= 500) {
+  } else if (card.diameter >= 500) {
     sizeScore = 4 // Regional destruction
-  } else if (diameter >= 140) {
+  } else if (card.diameter >= 140) {
     sizeScore = 3 // City-destroying size (NASA threshold for tracking)
-  } else if (diameter >= 50) {
+  } else if (card.diameter >= 50) {
     sizeScore = 2 // Building-destroying size
   }
   
-  // Distance-based threat factor (closer = more dangerous)
+  // Distance-based threat factor using accurate AU measurements
   let distanceScore = 1
-  if (distance !== null) {
-    if (distance < 0.05) { // Very close approach
+  if (card.missDistanceAU !== undefined) {
+    if (card.missDistanceAU < 0.05) { // Very close approach (< 0.05 AU)
       distanceScore = 4
-    } else if (distance < 0.1) { // Close approach
+    } else if (card.missDistanceAU < 0.1) { // Close approach (< 0.1 AU)
       distanceScore = 3
-    } else if (distance < 0.2) { // Moderate distance
+    } else if (card.missDistanceAU < 0.2) { // Moderate distance (< 0.2 AU)
       distanceScore = 2
     }
   }
   
   // Velocity-based impact energy (higher velocity = more destructive)
   let velocityScore = 1
-  if (velocity >= 70000) {
+  if (card.velocity >= 70000) {
     velocityScore = 4 // Extremely high energy impact
-  } else if (velocity >= 50000) {
+  } else if (card.velocity >= 50000) {
     velocityScore = 3 // High energy impact
-  } else if (velocity >= 30000) {
+  } else if (card.velocity >= 30000) {
     velocityScore = 2 // Moderate energy impact
   }
   
@@ -72,21 +74,42 @@ const calculateRarity = (diameter, velocity, name, distance = null) => {
   return { rarity, rarityColor, rarityGlow, threatLevel }
 }
 
-// Generate unique asteroid facts based on properties
+// Generate unique asteroid facts based on enhanced NASA properties
 const getAsteroidFact = (card) => {
   const facts = []
   
-  // Size-based facts
+  // NASA potentially hazardous status
+  if (card.isPotentiallyHazardous) {
+    facts.push(`🚨 NASA classified as Potentially Hazardous due to size (>${card.diameter}m) and close approach orbit!`)
+  }
+  
+  // Enhanced size-based facts with actual diameter
   if (card.diameter > 1000) {
-    facts.push(`🏔️ This massive space rock is over ${Math.round(card.diameter/1000)}km across - larger than most cities!`)
+    facts.push(`🏔️ This massive ${Math.round(card.diameter)}m space rock is larger than most cities!`)
   } else if (card.diameter > 500) {
     facts.push(`🏙️ At ${Math.round(card.diameter)}m wide, this asteroid could flatten several city blocks on impact.`)
-  } else if (card.diameter > 100) {
-    facts.push(`🏠 This ${Math.round(card.diameter)}m asteroid is roughly the size of a football stadium.`)
+  } else if (card.diameter > 140) {
+    facts.push(`�️ This ${Math.round(card.diameter)}m asteroid meets NASA's size threshold for potentially hazardous objects.`)
   } else if (card.diameter > 50) {
-    facts.push(`🚗 This house-sized asteroid (${Math.round(card.diameter)}m) would create a crater 10x its size.`)
+    facts.push(`🏠 This ${Math.round(card.diameter)}m house-sized asteroid would create a crater 10x its size.`)
   } else {
     facts.push(`🪨 This ${Math.round(card.diameter)}m space pebble burns up spectacularly in Earth's atmosphere.`)
+  }
+  
+  // Enhanced distance facts using accurate miss distance
+  if (card.missDistanceAU < 0.05) {
+    facts.push(`🌙 Extremely close approach! Only ${card.missDistanceLunar.toFixed(1)} lunar distances from Earth.`)
+  } else if (card.missDistanceAU < 0.1) {
+    facts.push(`🛸 Close approach at ${card.missDistanceLunar.toFixed(1)} lunar distances (${card.missDistanceAU.toFixed(3)} AU).`)
+  } else if (card.missDistanceAU < 0.5) {
+    facts.push(`🌍 Safe distance at ${(card.missDistance / 1000000).toFixed(1)} million km from Earth.`)
+  }
+  
+  // Absolute magnitude (brightness) facts
+  if (card.absoluteMagnitude < 18) {
+    facts.push(`✨ Bright magnitude H=${card.absoluteMagnitude.toFixed(1)} - visible to telescopes from great distances!`)
+  } else if (card.absoluteMagnitude > 25) {
+    facts.push(`🔬 Faint magnitude H=${card.absoluteMagnitude.toFixed(1)} - requires powerful telescopes to detect.`)
   }
   
   // Speed-based facts
@@ -96,26 +119,20 @@ const getAsteroidFact = (card) => {
     facts.push(`🚀 Moving at ${Math.round(card.velocity/1000)}k km/h - it could circle Earth in under 2 hours.`)
   } else if (card.velocity > 30000) {
     facts.push(`✈️ At ${Math.round(card.velocity/1000)}k km/h, it's 30x faster than a commercial jet.`)
-  } else {
-    facts.push(`🐌 Relatively slow at ${Math.round(card.velocity/1000)}k km/h - still 20x faster than a bullet!`)
   }
   
-  // Name-based facts
+  // Famous asteroid facts
   if (card.name.includes('Apophis')) {
-    facts.push(`🐍 Named after the Egyptian serpent god of chaos - fitting for this potentially hazardous asteroid!`)
+    facts.push(`🐍 Named after the Egyptian serpent god of chaos - this asteroid made headlines for its close 2029 approach!`)
   } else if (card.name.includes('Bennu')) {
-    facts.push(`🏺 Named after an ancient Egyptian bird deity, this asteroid was sampled by NASA's OSIRIS-REx mission.`)
-  } else if (card.name.includes('2023') || card.name.includes('2024') || card.name.includes('2025')) {
-    facts.push(`🔭 Recently discovered in ${card.name.match(/20\\d{2}/)?.[0] || 'recent years'} by NASA's asteroid detection network.`)
-  } else if (card.name.length > 15) {
-    facts.push(`📊 This asteroid's catalog designation contains precise orbital data used by astronomers worldwide.`)
-  } else {
-    facts.push(`🌌 This space wanderer has been traveling through our solar system for 4.6 billion years.`)
+    facts.push(`🏺 Target of NASA's OSIRIS-REx sample return mission - we have actual pieces of this asteroid!`)
+  } else if (card.name.includes('Didymos')) {
+    facts.push(`🎯 Target of NASA's DART mission - the first asteroid deflection test in human history!`)
   }
   
   // Randomly select 1-2 facts
-  const selectedFacts = facts.sort(() => 0.5 - Math.random()).slice(0, Math.random() > 0.7 ? 2 : 1)
-  return selectedFacts.join(' ')
+  const selectedFacts = facts.filter(fact => fact).sort(() => 0.5 - Math.random()).slice(0, Math.random() > 0.7 ? 2 : 1)
+  return selectedFacts.length > 0 ? selectedFacts.join(' ') : `🌌 This asteroid has been traveling through space for 4.6 billion years.`
 }
 
 // Generate asteroid image based on properties
@@ -137,7 +154,7 @@ const generateAsteroidImage = (diameter, velocity, name) => {
 }
 
 function AsteroidCard({ card, index }) {
-  const rarity = calculateRarity(card.diameter, card.velocity, card.name)
+  const rarity = calculateRarity(card)
   const asteroidImage = generateAsteroidImage(card.diameter, card.velocity, card.name)
   
   const formatSize = (diameter) => {
@@ -152,8 +169,9 @@ function AsteroidCard({ card, index }) {
   const formatVelocity = (velocity) => {
     if (velocity < 10000) return `${Math.round(velocity).toLocaleString()} km/h (Racing car)`
     if (velocity < 20000) return `${Math.round(velocity).toLocaleString()} km/h (Jetliner)`
-    if (velocity < 50000) return `${Math.round(velocity).toLocaleString()} km/h (Spacecraft)`
-    return `${Math.round(velocity).toLocaleString()} km/h (Hypersonic!)`
+    if (velocity < 40000) return `${Math.round(velocity).toLocaleString()} km/h (Bullet velocity)`
+    if (velocity < 60000) return `${Math.round(velocity).toLocaleString()} km/h (Escape velocity)`
+    return `${Math.round(velocity).toLocaleString()} km/h (Hypersonic meteor!)`
   }
   
   const getDiscoveryInfo = (timestamp) => {
@@ -167,9 +185,62 @@ function AsteroidCard({ card, index }) {
     return `Discovered on ${date.toLocaleDateString()}`
   }
 
+  const getNASADetails = (card) => {
+    const details = []
+    
+    // NASA Classification
+    if (card.isPotentiallyHazardous) {
+      details.push('🚨 NASA PHA Classification')
+    }
+    
+    // Orbit Type
+    if (card.orbitClass) {
+      const orbitTypes = {
+        'APO': '🔴 Apollo Group',
+        'ATE': '🟡 Aten Group', 
+        'AMO': '🟠 Amor Group',
+        'IEO': '🔵 Atira Group'
+      }
+      details.push(orbitTypes[card.orbitClass] || `🌌 ${card.orbitClass} Class`)
+    }
+    
+    // Discovery Year
+    if (card.firstObservationDate) {
+      const year = card.firstObservationDate.split('-')[0]
+      details.push(`📅 First observed: ${year}`)
+    }
+    
+    // Orbital Period
+    if (card.orbitalPeriod) {
+      const years = (card.orbitalPeriod / 365.25).toFixed(1)
+      details.push(`⏱️ Orbit: ${years} years`)
+    }
+    
+    // Observations
+    if (card.observationsUsed && card.observationsUsed > 100) {
+      details.push(`📡 ${card.observationsUsed} observations`)
+    }
+    
+    // Eccentricity
+    if (card.eccentricity !== null && card.eccentricity !== undefined) {
+      if (card.eccentricity < 0.1) {
+        details.push('⭕ Circular orbit')
+      } else if (card.eccentricity > 0.6) {
+        details.push('🥚 Elliptical orbit')
+      }
+    }
+    
+    // Miss Distance
+    if (card.missDistanceLunar) {
+      details.push(`🌙 ${card.missDistanceLunar.toFixed(1)} lunar distances`)
+    }
+    
+    return details.slice(0, 4) // Show top 4 most important details
+  }
+
   return (
     <motion.div
-      className="h-48"
+      className="h-80"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
@@ -225,11 +296,81 @@ function AsteroidCard({ card, index }) {
               {card.name}
             </h3>
             
-            {/* Quick stats */}
-            <div className="text-xs text-gray-300 space-y-1 flex-1 flex flex-col justify-center">
-              <div>📏 {formatSize(card.diameter)}</div>
-              <div>⚡ {formatVelocity(card.velocity)}</div>
-              <div className="text-xs font-bold" style={{ color: rarity.rarityColor }}>⚡ Threat Level: {rarity.threatLevel}/16</div>
+            {/* Comprehensive NASA Data Display */}
+            <div className="text-xs text-gray-300 space-y-1 flex-1 overflow-y-auto">
+              
+              {/* NASA ID & Classification */}
+              <div className="bg-blue-900/30 p-1 rounded text-center">
+                <div className="text-blue-300 font-bold">NASA ID: {card.id}</div>
+                {card.isPotentiallyHazardous && (
+                  <div className="text-red-400 font-bold">⚠️ POTENTIALLY HAZARDOUS</div>
+                )}
+              </div>
+              
+              {/* Physical Characteristics */}
+              <div className="space-y-1">
+                <div className="text-yellow-400 font-semibold">📏 PHYSICAL DATA:</div>
+                <div>Size: {card.diameterMin?.toFixed(0) || '?'}-{card.diameterMax?.toFixed(0) || '?'}m</div>
+                <div>Magnitude H: {card.absoluteMagnitude?.toFixed(1) || 'Unknown'}</div>
+              </div>
+              
+              {/* Approach Details */}
+              <div className="space-y-1">
+                <div className="text-green-400 font-semibold">🚀 APPROACH DATA:</div>
+                <div>Speed: {(card.velocityKms || card.velocity/3600)?.toFixed(1)} km/s</div>
+                <div>Distance: {card.missDistanceLunar?.toFixed(1) || '?'} lunar distances</div>
+                <div>Date: {card.approachDateFull || card.approachDate || 'Unknown'}</div>
+              </div>
+              
+              {/* Orbital Information */}
+              {(card.orbitalPeriod || card.eccentricity || card.orbitClass) && (
+                <div className="space-y-1">
+                  <div className="text-purple-400 font-semibold">🌌 ORBITAL DATA:</div>
+                  {card.orbitalPeriod && (
+                    <div>Period: {card.orbitalPeriod < 365 ? `${Math.round(card.orbitalPeriod)}d` : `${(card.orbitalPeriod/365.25).toFixed(1)}y`}</div>
+                  )}
+                  {card.eccentricity !== null && card.eccentricity !== undefined && (
+                    <div>Eccentricity: {card.eccentricity.toFixed(3)}</div>
+                  )}
+                  {card.orbitClass && (
+                    <div>Class: {card.orbitClass} ({card.orbitClassDescription || 'NASA classified'})</div>
+                  )}
+                  {card.inclination && (
+                    <div>Inclination: {card.inclination.toFixed(1)}°</div>
+                  )}
+                </div>
+              )}
+              
+              {/* Discovery & Observations */}
+              {(card.firstObservationDate || card.observationsUsed) && (
+                <div className="space-y-1">
+                  <div className="text-cyan-400 font-semibold">🔭 DISCOVERY DATA:</div>
+                  {card.firstObservationDate && (
+                    <div>First seen: {card.firstObservationDate}</div>
+                  )}
+                  {card.observationsUsed && (
+                    <div>Observations: {card.observationsUsed.toLocaleString()}</div>
+                  )}
+                  {card.dataArcInDays && (
+                    <div>Tracking: {card.dataArcInDays} days</div>
+                  )}
+                </div>
+              )}
+              
+              {/* NASA JPL Link */}
+              {card.nasaJplUrl && (
+                <div className="bg-orange-900/30 p-1 rounded text-center">
+                  <div className="text-orange-300 text-xs">🔗 NASA JPL Database</div>
+                </div>
+              )}
+              
+              {/* Threat Assessment */}
+              <div className="bg-gray-800/50 p-1 rounded text-center mt-2">
+                <div className="text-xs font-bold" style={{ color: rarity.rarityColor }}>
+                  ⚡ Threat Level: {rarity.threatLevel}/16
+                </div>
+              </div>
+              
             </div>
             
 
@@ -260,7 +401,7 @@ function CardCollection({ collectedCards, onClose }) {
     
     // Rarity filters
     if (['common', 'uncommon', 'epic', 'legendary'].includes(selectedCategory)) {
-      const rarity = calculateRarity(card.diameter, card.velocity, card.name)
+      const rarity = calculateRarity(card)
       return rarity.rarity.toLowerCase() === selectedCategory
     }
     
@@ -306,7 +447,7 @@ function CardCollection({ collectedCards, onClose }) {
               <div className="flex flex-wrap gap-4 text-sm">
                 {['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'].map(rarityType => {
                   const count = collectedCards.filter(card => 
-                    calculateRarity(card.diameter, card.velocity, card.name).rarity === rarityType
+                    calculateRarity(card).rarity === rarityType
                   ).length
                   const colors = {
                     'Common': '#9CA3AF',
@@ -354,9 +495,9 @@ function CardCollection({ collectedCards, onClose }) {
               </div>
             </div>
 
-            {/* Cards grid */}
+            {/* Cards grid - Larger cards for better visibility */}
             <div className="flex-1 overflow-y-auto px-4 pb-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 <AnimatePresence>
                   {filteredCards.map((card, index) => (
                     <AsteroidCard
