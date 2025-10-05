@@ -14,11 +14,21 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
       isCorrect: index === question.correctAnswer
     }))
     
+    console.log('🔀 BEFORE SHUFFLE:')
+    console.log('Original answers:', question.answers)
+    console.log('Correct answer index:', question.correctAnswer)
+    console.log('Correct answer text:', question.answers[question.correctAnswer])
+    console.log('Answers with flags:', answersWithIndex)
+    
     // Fisher-Yates shuffle algorithm
     for (let i = answersWithIndex.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
       ;[answersWithIndex[i], answersWithIndex[j]] = [answersWithIndex[j], answersWithIndex[i]]
     }
+    
+    console.log('🔀 AFTER SHUFFLE:')
+    console.log('Shuffled answers:', answersWithIndex)
+    console.log('Correct answer is now at position:', answersWithIndex.findIndex(a => a.isCorrect))
     
     return answersWithIndex
   }, [question])
@@ -31,6 +41,18 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
     
     const selectedAnswerData = shuffledAnswers[answerIndex]
     const isCorrect = selectedAnswerData.isCorrect
+    
+    // Debug logging
+    console.log('🎯 ANSWER DEBUG:', {
+      originalQuestion: question,
+      originalCorrectIndex: question.correctAnswer,
+      originalCorrectAnswer: question.answers[question.correctAnswer],
+      selectedIndex: answerIndex,
+      selectedAnswerText: selectedAnswerData.text,
+      selectedAnswerData: selectedAnswerData,
+      isCorrectResult: isCorrect,
+      allShuffledAnswers: shuffledAnswers
+    })
     
     // Delay before calling onAnswer to show result
     setTimeout(() => {
@@ -169,7 +191,7 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            {selectedAnswer === question.correctAnswer ? (
+            {shuffledAnswers[selectedAnswer]?.isCorrect ? (
               <div className="text-neon-green">
                 <div className="text-2xl mb-2">✅ Correct!</div>
                 <div className="text-lg">Asteroid destroyed! +{question.points || 10} points</div>
@@ -180,7 +202,10 @@ function QuestionPanel({ question, asteroid, onAnswer, timeLeft }) {
                 <div className="text-lg">
                   Earth takes damage! Correct answer was: <br/>
                   <span className="text-neon-green font-semibold">
-                    {String.fromCharCode(65 + question.correctAnswer)}. {question.answers[question.correctAnswer]}
+                    {(() => {
+                      const correctAnswerIndex = shuffledAnswers.findIndex(answer => answer.isCorrect);
+                      return `${String.fromCharCode(65 + correctAnswerIndex)}. ${shuffledAnswers[correctAnswerIndex].text}`;
+                    })()}
                   </span>
                 </div>
               </div>
