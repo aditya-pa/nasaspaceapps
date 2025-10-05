@@ -1,0 +1,9 @@
+# Ignore large files for Netlify deployment
+public/bg.mp4
+public/59-earth/
+public/asteroid_*.glb
+public/sounds/game_music.mp3
+
+# Development files
+src/App-*.jsx
+large-assets/
