@@ -1,51 +1,75 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Calculate asteroid rarity based on size, speed, and discovery rarity
-const calculateRarity = (diameter, velocity, name) => {
+// Calculate asteroid threat level rarity based on classification, distance, and size
+const calculateRarity = (diameter, velocity, name, distance = null) => {
   let rarity = 'Common'
   let rarityColor = '#9CA3AF' // Gray
   let rarityGlow = '0 0 10px rgba(156, 163, 175, 0.5)'
   
-  // Size factor (much more balanced - most asteroids should be common)
-  let sizeScore = diameter < 50 ? 1 : diameter < 150 ? 2 : diameter < 400 ? 3 : diameter < 800 ? 4 : 5
-  
-  // Speed factor (much more balanced - most speeds should be common)
-  let speedScore = velocity < 20000 ? 1 : velocity < 35000 ? 2 : velocity < 50000 ? 3 : velocity < 70000 ? 4 : 5
-  
-  // Name factor (famous asteroids and short names are rarer)
-  let nameScore = 1 // Default score for all asteroids
-  if (name.includes('Apophis') || name.includes('Bennu') || name.includes('Ryugu') || name.includes('Itokawa') || name.includes('Ceres') || name.includes('Vesta')) {
-    nameScore = 5 // Famous asteroids
-  } else if (name.length < 8 && !name.includes('2023') && !name.includes('2024') && !name.includes('2025')) {
-    nameScore = 3 // Short, memorable names
-  } else if (name.length > 15) {
-    nameScore = 2 // Long catalog numbers
+  // Classification factor - potentially hazardous objects are rarer
+  let classificationScore = 1
+  if (name.includes('Apophis') || name.includes('Bennu') || name.includes('Didymos') || name.includes('1999 RQ36')) {
+    classificationScore = 5 // Known potentially hazardous asteroids
+  } else if (name.match(/^\d{4} [A-Z]{2}\d*$/)) {
+    classificationScore = 2 // Recent discoveries (numbered format)
+  } else if (name.length < 8) {
+    classificationScore = 3 // Named asteroids are typically more significant
   }
   
-  const totalScore = sizeScore + speedScore + nameScore
+  // Size-based threat factor
+  let sizeScore = 1
+  if (diameter >= 1000) {
+    sizeScore = 5 // Civilization-ending threat
+  } else if (diameter >= 500) {
+    sizeScore = 4 // Regional destruction
+  } else if (diameter >= 140) {
+    sizeScore = 3 // City-destroying size (NASA threshold for tracking)
+  } else if (diameter >= 50) {
+    sizeScore = 2 // Building-destroying size
+  }
   
-  // Much more balanced thresholds
-  if (totalScore >= 13) {
+  // Distance-based threat factor (closer = more dangerous)
+  let distanceScore = 1
+  if (distance !== null) {
+    if (distance < 0.05) { // Very close approach
+      distanceScore = 4
+    } else if (distance < 0.1) { // Close approach
+      distanceScore = 3
+    } else if (distance < 0.2) { // Moderate distance
+      distanceScore = 2
+    }
+  }
+  
+  // Velocity-based impact energy (higher velocity = more destructive)
+  let velocityScore = 1
+  if (velocity >= 70000) {
+    velocityScore = 4 // Extremely high energy impact
+  } else if (velocity >= 50000) {
+    velocityScore = 3 // High energy impact
+  } else if (velocity >= 30000) {
+    velocityScore = 2 // Moderate energy impact
+  }
+  
+  const threatLevel = classificationScore + sizeScore + distanceScore + velocityScore
+  
+  // Threat-based rarity classification
+  if (threatLevel >= 15) {
     rarity = 'Legendary'
-    rarityColor = '#F59E0B' // Gold
-    rarityGlow = '0 0 20px rgba(245, 158, 11, 0.8)'
-  } else if (totalScore >= 10) {
+    rarityColor = '#DC2626' // Red - Extinction level threat
+    rarityGlow = '0 0 20px rgba(220, 38, 38, 0.8)'
+  } else if (threatLevel >= 12) {
     rarity = 'Epic' 
-    rarityColor = '#A855F7' // Purple
-    rarityGlow = '0 0 15px rgba(168, 85, 247, 0.6)'
-  } else if (totalScore >= 7) {
-    rarity = 'Rare'
-    rarityColor = '#3B82F6' // Blue  
-    rarityGlow = '0 0 12px rgba(59, 130, 246, 0.5)'
-  } else if (totalScore >= 5) {
+    rarityColor = '#F59E0B' // Orange - Major regional threat
+    rarityGlow = '0 0 15px rgba(245, 158, 11, 0.6)'
+  } else if (threatLevel >= 8) {
     rarity = 'Uncommon'
-    rarityColor = '#10B981' // Green
-    rarityGlow = '0 0 10px rgba(16, 185, 129, 0.4)'
+    rarityColor = '#EAB308' // Yellow - Local threat
+    rarityGlow = '0 0 12px rgba(234, 179, 8, 0.5)'
   } 
-  // Else stays Common (totalScore 3-4)
+  // Else stays Common (low threat)
   
-  return { rarity, rarityColor, rarityGlow, totalScore }
+  return { rarity, rarityColor, rarityGlow, threatLevel }
 }
 
 // Generate unique asteroid facts based on properties
@@ -112,7 +136,6 @@ const generateAsteroidImage = (diameter, velocity, name) => {
 }
 
 function AsteroidCard({ card, index }) {
-  const [isFlipped, setIsFlipped] = useState(false)
   const rarity = calculateRarity(card.diameter, card.velocity, card.name)
   const asteroidImage = generateAsteroidImage(card.diameter, card.velocity, card.name)
   
@@ -145,17 +168,12 @@ function AsteroidCard({ card, index }) {
 
   return (
     <motion.div
-      className="perspective-1000 h-48"
+      className="h-48"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
     >
-      <motion.div
-        className="relative w-full h-full preserve-3d cursor-pointer"
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.6, type: "spring" }}
-        onClick={() => setIsFlipped(!isFlipped)}
-      >
+      <div className="relative w-full h-full">
         {/* Front of card */}
         <div className="absolute inset-0 backface-hidden glassmorphic rounded-xl p-4 border-2" 
              style={{ borderColor: rarity.rarityColor, boxShadow: rarity.rarityGlow }}>
@@ -210,77 +228,15 @@ function AsteroidCard({ card, index }) {
             <div className="text-sm text-gray-300 space-y-1">
               <div>📏 {formatSize(card.diameter)}</div>
               <div>⚡ {formatVelocity(card.velocity)}</div>
-              <div className="text-xs" style={{ color: rarity.rarityColor }}>⭐ Score: {rarity.totalScore}/15</div>
+              <div className="text-xs" style={{ color: rarity.rarityColor }}>⚡ Threat Level: {rarity.threatLevel}/16</div>
             </div>
             
-            {/* Flip indicator */}
-            <div className="text-xs text-gray-400 mt-2">
-              Click to flip 🔄
-            </div>
+
           </div>
         </div>
 
-        {/* Back of card */}
-        <div className="absolute inset-0 backface-hidden glassmorphic rounded-xl p-3 border-2 rotateY-180"
-             style={{ borderColor: rarity.rarityColor, boxShadow: rarity.rarityGlow }}>
-          <div className="h-full flex flex-col">
-            {/* Header with rarity */}
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-bold text-sm truncate" style={{ color: rarity.rarityColor }}>
-                {card.name}
-              </h3>
-              <div className="text-xs px-2 py-1 rounded-full font-bold"
-                   style={{ 
-                     backgroundColor: rarity.rarityColor + '20',
-                     color: rarity.rarityColor
-                   }}>
-                {rarity.rarity}
-              </div>
-            </div>
-            
-            {/* Scientific Data */}
-            <div className="text-xs text-gray-300 space-y-2 flex-1">
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                <div className="bg-gray-800/50 rounded p-2">
-                  <div className="text-blue-400">📏 Diameter</div>
-                  <div className="font-bold">{Math.round(card.diameter)}m</div>
-                </div>
-                <div className="bg-gray-800/50 rounded p-2">
-                  <div className="text-green-400">⚡ Velocity</div>
-                  <div className="font-bold">{Math.round(card.velocity / 1000)}k km/h</div>
-                </div>
-              </div>
-              
-              <div className="space-y-1">
-                <div><span className="text-purple-400">🔬 Type:</span> Near-Earth Object</div>
-                <div><span className="text-yellow-400">🎯 Threat Level:</span> {card.diameter > 500 ? 'High' : card.diameter > 100 ? 'Medium' : 'Low'}</div>
-                <div><span className="text-orange-400">🌍 Distance:</span> {(Math.random() * 50 + 0.1).toFixed(1)}M km</div>
-                <div><span className="text-pink-400">📅 Added:</span> {getDiscoveryInfo(card.timestamp)}</div>
-              </div>
-              
-              {/* Enhanced fun fact */}
-              <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 rounded-lg p-2 mt-2">
-                <div className="text-blue-200 text-xs leading-relaxed">
-                  💡 <strong>Do you know?</strong><br/>
-                  {getAsteroidFact(card)}
-                </div>
-              </div>
-              
-              {/* Collection stats */}
-              <div className="bg-gray-900/50 rounded-lg p-2 mt-2">
-                <div className="text-center">
-                  <div className="text-xs text-gray-400">Collection Value</div>
-                  <div className="font-bold" style={{ color: rarity.rarityColor }}>⭐ {rarity.totalScore}/15 Points</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="text-xs text-gray-400 mt-2 text-center">
-              Click to flip back 🔄
-            </div>
-          </div>
-        </div>
-      </motion.div>
+
+      </div>
     </motion.div>
   )
 }
@@ -291,10 +247,9 @@ function CardCollection({ collectedCards, onClose }) {
   const categories = [
     { id: 'all', name: 'All Cards', icon: '📚' },
     { id: 'common', name: 'Common', icon: '⚪', color: '#9CA3AF' },
-    { id: 'uncommon', name: 'Uncommon', icon: '🟢', color: '#10B981' },
-    { id: 'rare', name: 'Rare', icon: '🔵', color: '#3B82F6' },
-    { id: 'epic', name: 'Epic', icon: '🟣', color: '#A855F7' },
-    { id: 'legendary', name: 'Legendary', icon: '🟡', color: '#F59E0B' },
+    { id: 'uncommon', name: 'Uncommon', icon: '�', color: '#EAB308' },
+    { id: 'epic', name: 'Epic', icon: '�', color: '#F59E0B' },
+    { id: 'legendary', name: 'Legendary', icon: '�', color: '#DC2626' },
     { id: 'small', name: 'Small (<100m)', icon: '�' },
     { id: 'large', name: 'Large (>500m)', icon: '🏔️' }
   ]
@@ -303,7 +258,7 @@ function CardCollection({ collectedCards, onClose }) {
     if (selectedCategory === 'all') return true
     
     // Rarity filters
-    if (['common', 'uncommon', 'rare', 'epic', 'legendary'].includes(selectedCategory)) {
+    if (['common', 'uncommon', 'epic', 'legendary'].includes(selectedCategory)) {
       const rarity = calculateRarity(card.diameter, card.velocity, card.name)
       return rarity.rarity.toLowerCase() === selectedCategory
     }
