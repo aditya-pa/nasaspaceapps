@@ -1,6 +1,7 @@
 {
   "name": "astro-defenders",
   "version": "1.0.0",
+  "type": "module",
   "description": "Educational NASA space game for kids - defend Earth from asteroids!",
 
   "scripts": {
