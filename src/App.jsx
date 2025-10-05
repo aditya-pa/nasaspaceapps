@@ -13,6 +13,7 @@ import IntroPage from './components/IntroPage'
 import DefenseBeamManager from './components/DefenseBeamManager'
 import ShieldBoundary from './components/ShieldBoundary'
 import FireEffectManager from './components/FireEffectManager'
+import GameOverCutscene from './components/GameOverCutscene'
 import { initSounds, playSound, stopSound } from './services/soundManager'
 import { loadGameData, saveGameData } from './services/storage'
 import { fetchAsteroidData } from './services/nasaApi'
@@ -25,6 +26,7 @@ const GAME_STATES = {
   MENU: 'menu',
   PLAYING: 'playing',
   PAUSED: 'paused',
+  CUTSCENE: 'cutscene',
   GAME_OVER: 'game_over',
   SPACEPEDIA: 'spacepedia'
 }
@@ -397,9 +399,9 @@ function App() {
     console.log('🔍 Game over check - Shield:', shield, 'GameState:', gameState)
     if (shield <= 0 && gameState === GAME_STATES.PLAYING) {
       console.log('🚨 GAME OVER TRIGGERED! Shield:', shield)
-      setGameState(GAME_STATES.GAME_OVER)
+      setGameState(GAME_STATES.CUTSCENE) // Show cutscene first
       stopSound('backgroundMusic')
-      playSound('gameOver')
+      // Don't play game over sound yet - let cutscene handle it
       
       // Save high score
       if (score > highScore) {
@@ -408,6 +410,12 @@ function App() {
       }
     }
   }, [shield, gameState, score, highScore, collectedCards])
+
+  // Handle cutscene completion
+  const handleCutsceneComplete = useCallback(() => {
+    setGameState(GAME_STATES.GAME_OVER)
+    playSound('gameOver')
+  }, [])
 
   // Handle loading completion
   const handleLoadingComplete = useCallback(() => {
@@ -648,6 +656,14 @@ function App() {
               />
             )}
           </>
+        )}
+
+        {gameState === GAME_STATES.CUTSCENE && (
+          <GameOverCutscene
+            onCutsceneComplete={handleCutsceneComplete}
+            score={score}
+            highScore={highScore}
+          />
         )}
 
         {gameState === GAME_STATES.GAME_OVER && (

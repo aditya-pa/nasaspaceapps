@@ -49,6 +49,14 @@
     @apply hover:bg-neon-blue hover:text-space-900 hover:shadow-lg hover:shadow-neon-blue/50;
   }
 
+  .text-shadow-glow {
+    text-shadow: 
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor,
+      2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
   .btn-danger {
     @apply btn-neon border-red-500 text-red-500;
     @apply hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/50;
