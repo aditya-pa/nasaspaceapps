@@ -18,6 +18,9 @@ export default {
           purple: '#bf00ff',
           green: '#39ff14',
           pink: '#ff007f',
+          gold: '#ffd700',
+          orange: '#ff6600',
+          red: '#ff073a',
         }
       },
       animation: {

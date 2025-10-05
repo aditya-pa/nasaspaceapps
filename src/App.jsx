@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import LoadingScreen from './components/LoadingScreen'
 import EarthScene from './components/EarthScene'
 import AsteroidManager from './components/AsteroidManager'
 import QuestionPanel from './components/QuestionPanel'
@@ -15,6 +16,7 @@ import { fetchAsteroidData } from './services/nasaApi'
 import { getWaveConfig, getDailyChallenge } from './data/gameProgression'
 
 const GAME_STATES = {
+  LOADING: 'loading',
   INTRO: 'intro',
   MENU: 'menu',
   PLAYING: 'playing',
@@ -24,8 +26,8 @@ const GAME_STATES = {
 }
 
 function App() {
-  // Game state
-  const [gameState, setGameState] = useState(GAME_STATES.INTRO)
+  // Game state - Start with loading
+  const [gameState, setGameState] = useState(GAME_STATES.LOADING)
   const [score, setScore] = useState(0)
   const [shield, setShield] = useState(100)
   const [level, setLevel] = useState(1)
@@ -311,6 +313,11 @@ function App() {
     }
   }, [shield, gameState, score, highScore, collectedCards])
 
+  // Handle loading completion
+  const handleLoadingComplete = useCallback(() => {
+    setGameState(GAME_STATES.INTRO)
+  }, [])
+
   return (
     <div className="w-full h-full bg-space-gradient overflow-hidden relative">
       {/* Background Video - Optional for web deployment */}
@@ -354,6 +361,9 @@ function App() {
 
       {/* Game States */}
       <AnimatePresence mode="wait">
+        {gameState === GAME_STATES.LOADING && (
+          <LoadingScreen onLoadingComplete={handleLoadingComplete} />
+        )}
         {gameState === GAME_STATES.INTRO && (
           <IntroPage onComplete={() => setGameState(GAME_STATES.MENU)} />
         )}
@@ -383,7 +393,7 @@ function App() {
                 Defend Earth from real NASA asteroids by answering fun quiz questions!
               </motion.p>
               <motion.button
-                className="btn-primary text-2xl px-8 py-4"
+                className="btn-primary text-lg px-8 py-4"
                 onClick={startGame}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -394,7 +404,7 @@ function App() {
                 🚀 Start Mission
               </motion.button>
               <motion.button
-                className="btn-neon border-neon-purple text-neon-purple ml-4 px-6 py-3"
+                className="btn-neon border-neon-purple text-neon-purple ml-4 text-lg px-8 py-4"
                 onClick={() => setGameState(GAME_STATES.SPACEPEDIA)}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}

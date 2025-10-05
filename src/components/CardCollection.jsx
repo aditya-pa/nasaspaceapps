@@ -387,13 +387,13 @@ function CardCollection({ collectedCards, onClose }) {
   const [selectedCategory, setSelectedCategory] = useState('all')
   
   const categories = [
-    { id: 'all', name: 'All Cards', icon: '📚' },
-    { id: 'common', name: 'Common', icon: '⚪', color: '#9CA3AF' },
-    { id: 'uncommon', name: 'Uncommon', icon: '�', color: '#EAB308' },
-    { id: 'epic', name: 'Epic', icon: '�', color: '#F59E0B' },
-    { id: 'legendary', name: 'Legendary', icon: '�', color: '#DC2626' },
-    { id: 'small', name: 'Small (<100m)', icon: '�' },
-    { id: 'large', name: 'Large (>500m)', icon: '🏔️' }
+    { id: 'all', name: 'All Cards', icon: '★', color: '#60A5FA' },
+    { id: 'common', name: 'Common', icon: '●', color: '#9CA3AF' },
+    { id: 'uncommon', name: 'Uncommon', icon: '●', color: '#10B981' },
+    { id: 'epic', name: 'Epic', icon: '●', color: '#A855F7' },
+    { id: 'legendary', name: 'Legendary', icon: '●', color: '#F59E0B' },
+    { id: 'small', name: 'Small (<100m)', icon: '●', color: '#3B82F6' },
+    { id: 'large', name: 'Large (>500m)', icon: '●', color: '#EF4444' }
   ]
 
   const filteredCards = collectedCards.filter(card => {

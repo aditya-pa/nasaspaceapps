@@ -133,11 +133,11 @@ function AchievementManager({
             <div className="flex items-center space-x-3">
               <div className="text-3xl">{achievement.icon}</div>
               <div>
-                <div className="text-neon-gold font-bold">Achievement Unlocked!</div>
-                <div className="text-white font-semibold">{achievement.name}</div>
-                <div className="text-gray-300 text-sm">{achievement.description}</div>
+                <div className="text-yellow-400 font-bold text-lg">Achievement Unlocked!</div>
+                <div className="text-white font-semibold text-lg">{achievement.name}</div>
+                <div className="text-gray-100 text-sm">{achievement.description}</div>
                 {achievement.reward && (
-                  <div className="text-neon-green text-xs mt-1">
+                  <div className="text-green-400 text-sm mt-1 font-medium">
                     Reward: {achievement.reward.type === 'points' ? `+${achievement.reward.value} points` :
                              achievement.reward.type === 'powerup' ? `Free ${achievement.reward.value}` :
                              achievement.reward.type === 'permanent' ? achievement.reward.value :
